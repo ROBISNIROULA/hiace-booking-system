@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>View Users - Admin</title>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box;
+            font-family:'Segoe UI', sans-serif; }
+        body { display:flex; min-height:100vh; background:#f0f2f5; }
+        .sidebar {
+            width:260px; background:#1e293b;
+            display:flex; flex-direction:column;
+            position:fixed; height:100vh;
+        }
+        .sidebar-brand {
+            padding:22px 20px; background:#0f172a;
+            display:flex; align-items:center; gap:10px;
+            border-bottom:1px solid #334155;
+        }
+        .sidebar-brand .brand-icon {
+            width:40px; height:40px; background:#3b82f6;
+            border-radius:10px; display:flex;
+            align-items:center; justify-content:center;
+            font-size:18px;
+        }
+        .sidebar-brand h2 { color:#38bdf8; font-size:17px; font-weight:700; }
+        .sidebar nav { flex:1; padding:15px 0; }
+        .sidebar nav a {
+            display:flex; align-items:center; gap:12px;
+            padding:13px 22px; color:#94a3b8;
+            text-decoration:none; font-size:14px;
+            transition:0.2s; border-left:3px solid transparent;
+        }
+        .sidebar nav a:hover, .sidebar nav a.active {
+            background:#334155; color:white;
+            border-left-color:#3b82f6;
+        }
+        .sidebar-footer {
+            padding:18px 22px; border-top:1px solid #334155;
+            font-size:12px; color:#64748b;
+        }
+        .sidebar-footer a {
+            color:#f87171; text-decoration:none;
+            display:flex; align-items:center; gap:6px;
+            margin-top:5px; font-size:13px;
+        }
+        .main { margin-left:260px; flex:1; padding:28px; }
+        .page-title {
+            display:flex; align-items:center; gap:10px;
+            margin-bottom:25px;
+        }
+        .page-title h1 { font-size:22px; font-weight:700; color:#1e293b; }
+
+        /* Stats */
+        .stats-row {
+            display:grid; grid-template-columns:repeat(3,1fr);
+            gap:16px; margin-bottom:22px;
+        }
+        .stat-card {
+            background:white; border-radius:12px;
+            padding:18px; text-align:center;
+            box-shadow:0 2px 8px rgba(0,0,0,0.06);
+            border-top:4px solid #3b82f6;
+        }
+        .stat-card .num { font-size:26px; font-weight:800; color:#1e293b; }
+        .stat-card .lbl { font-size:12px; color:#64748b; margin-top:3px; }
+
+        /* Table */
+        .table-card {
+            background:white; border-radius:16px;
+            box-shadow:0 2px 10px rgba(0,0,0,0.07);
+            overflow:hidden;
+        }
+        .table-header {
+            background:linear-gradient(135deg,#1e293b,#334155);
+            padding:16px 22px; color:white;
+            display:flex; justify-content:space-between;
+            align-items:center;
+        }
+        .table-header h2 {
+            font-size:16px; font-weight:700;
+            display:flex; align-items:center; gap:8px;
+        }
+        table { width:100%; border-collapse:collapse; }
+        th {
+            background:#f8fafc; padding:13px 16px;
+            text-align:left; font-size:12px; font-weight:700;
+            color:#64748b; text-transform:uppercase;
+            letter-spacing:0.5px;
+        }
+        td {
+            padding:14px 16px; border-bottom:1px solid #f1f5f9;
+            font-size:13px; color:#374151;
+        }
+        tr:last-child td { border-bottom:none; }
+        tr:hover td { background:#f8fafc; }
+        .avatar {
+            width:34px; height:34px; border-radius:50%;
+            background:linear-gradient(135deg,#3b82f6,#2563eb);
+            color:white; display:flex; align-items:center;
+            justify-content:center; font-weight:700;
+            font-size:14px;
+        }
+        .user-cell { display:flex; align-items:center; gap:10px; }
+        .role-badge {
+            padding:3px 10px; border-radius:20px;
+            font-size:11px; font-weight:700;
+            background:#dbeafe; color:#1d4ed8;
+        }
+        .empty-state {
+            text-align:center; padding:60px; color:#94a3b8;
+        }
+        .empty-state i {
+            font-size:44px; display:block; margin-bottom:12px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <div class="sidebar-brand">
+        <div class="brand-icon">🚐</div>
+        <h2>Hiace Admin</h2>
+    </div>
+    <nav>
+        <a th:href="@{/admin/dashboard}">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+        <a th:href="@{/admin/hiaces}">
+            <i class="fas fa-bus"></i> Manage Hiaces
+        </a>
+        <a th:href="@{/admin/routes}">
+            <i class="fas fa-route"></i> Manage Routes
+        </a>
+        <a th:href="@{/admin/bookings}">
+            <i class="fas fa-clipboard-list"></i> View Bookings
+        </a>
+        <a th:href="@{/admin/users}" class="active">
+            <i class="fas fa-users"></i> View Users
+        </a>
+    </nav>
+    <div class="sidebar-footer">
+        <span>Logged in as Admin</span>
+        <a th:href="@{/users/logout}">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+    </div>
+</div>
+
+<div class="main">
+    <div class="page-title">
+        <span style="font-size:24px;">👥</span>
+        <h1>Registered Users</h1>
+    </div>
+
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="num" th:text="${users.size()}">0</div>
+            <div class="lbl">Total Users</div>
+        </div>
+        <div class="stat-card" style="border-top-color:#10b981;">
+            <div class="num" style="color:#10b981;"
+                 th:text="${users.size()}">0
+            </div>
+            <div class="lbl">Active Users</div>
+        </div>
+        <div class="stat-card" style="border-top-color:#f59e0b;">
+            <div class="num" style="color:#f59e0b;">Nepal</div>
+            <div class="lbl">Location</div>
+        </div>
+    </div>
+
+    <div class="table-card">
+        <div class="table-header">
+            <h2><i class="fas fa-users"></i> All Users</h2>
+            <span style="background:rgba(255,255,255,0.15);
+                         padding:4px 12px;border-radius:20px;
+                         font-size:12px;"
+                  th:text="${users.size()} + ' registered'">
+            </span>
+        </div>
+
+        <div th:if="${#lists.isEmpty(users)}"
+             class="empty-state">
+            <i class="fas fa-users"></i>
+            <p>No users registered yet.</p>
+        </div>
+
+        <table th:unless="${#lists.isEmpty(users)}">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>User</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Gender</th>
+                    <th>Role</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="u, s : ${users}">
+                    <td>
+                        <strong th:text="${s.count}"></strong>
+                    </td>
+                    <td>
+                        <div class="user-cell">
+                            <div class="avatar"
+                                 th:text="${#strings.substring(
+                                            u.firstname,0,1)}">
+                            </div>
+                            <div>
+                                <div style="font-weight:600;"
+                                     th:text="${u.firstname}+' '+${u.lastname}">
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td th:text="${u.username}"></td>
+                    <td th:text="${u.email}"></td>
+                    <td th:text="${u.gender}"></td>
+                    <td>
+                        <span class="role-badge"
+                              th:text="${u.role}">
+                        </span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

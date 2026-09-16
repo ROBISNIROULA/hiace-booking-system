@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Signup - Hiace Booking</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box;
+            font-family:'Segoe UI', sans-serif; }
+
+        body {
+            background:linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            display:flex; justify-content:center;
+            align-items:center; min-height:100vh; padding:30px 20px;
+        }
+
+        .wrapper {
+            display:flex; width:950px; border-radius:20px;
+            overflow:hidden; box-shadow:0 25px 60px rgba(0,0,0,0.5);
+        }
+
+        /* Left */
+        .left-panel {
+            background:linear-gradient(160deg, #7c3aed, #4c1d95);
+            width:320px; padding:45px 30px;
+            display:flex; flex-direction:column;
+            justify-content:center; color:white; flex-shrink:0;
+        }
+        .admin-badge {
+            display:inline-flex; align-items:center; gap:6px;
+            background:rgba(255,255,255,0.15); padding:7px 14px;
+            border-radius:20px; font-size:11px; font-weight:700;
+            margin-bottom:22px; width:fit-content;
+            letter-spacing:0.5px;
+        }
+        .left-panel h2 {
+            font-size:26px; font-weight:800; margin-bottom:10px;
+        }
+        .left-panel h2 span { color:#c4b5fd; }
+        .left-panel p {
+            font-size:13px; color:rgba(255,255,255,0.7);
+            line-height:1.6; margin-bottom:30px;
+        }
+
+        /* Security code highlight */
+        .security-box {
+            background:rgba(255,255,255,0.1);
+            border:1px solid rgba(255,255,255,0.2);
+            border-radius:12px; padding:16px;
+            margin-bottom:20px;
+        }
+        .security-box .sec-label {
+            font-size:11px; color:rgba(255,255,255,0.6);
+            text-transform:uppercase; letter-spacing:1px;
+            margin-bottom:6px;
+        }
+        .security-box .sec-note {
+            font-size:13px; color:#fbbf24; font-weight:600;
+        }
+        .security-box .sec-desc {
+            font-size:11px; color:rgba(255,255,255,0.6);
+            margin-top:4px;
+        }
+
+        .requirement {
+            display:flex; align-items:center; gap:8px;
+            margin-bottom:12px; font-size:12px;
+            color:rgba(255,255,255,0.7);
+        }
+        .requirement .dot {
+            width:6px; height:6px; border-radius:50%;
+            background:#c4b5fd; flex-shrink:0;
+        }
+
+        /* Right */
+        .right-panel {
+            background:white; flex:1;
+            padding:40px 35px; overflow-y:auto;
+        }
+        .right-panel h2 {
+            font-size:22px; font-weight:700;
+            color:#1e293b; margin-bottom:4px;
+        }
+        .right-panel .subtitle {
+            font-size:13px; color:#64748b; margin-bottom:22px;
+        }
+
+        /* Alerts */
+        .alert {
+            padding:12px 16px; border-radius:10px;
+            font-size:13px; margin-bottom:16px;
+            display:flex; align-items:flex-start; gap:8px;
+        }
+        .alert-error {
+            background:#fdf4ff; border:1px solid #d8b4fe;
+            color:#6d28d9;
+        }
+        .alert-warning {
+            background:#fffbeb; border:1px solid #fcd34d;
+            color:#92400e;
+        }
+
+        /* Form */
+        .form-row {
+            display:grid; grid-template-columns:1fr 1fr; gap:14px;
+        }
+        .form-group { margin-bottom:15px; }
+        .form-group label {
+            display:block; font-size:11px; font-weight:700;
+            color:#374151; margin-bottom:6px;
+            text-transform:uppercase; letter-spacing:0.5px;
+        }
+        .form-group input,
+        .form-group select {
+            width:100%; padding:11px 14px;
+            border:2px solid #e5e7eb; border-radius:10px;
+            font-size:14px; outline:none; transition:0.2s;
+            background:#fafafa;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color:#7c3aed; background:white;
+            box-shadow:0 0 0 3px rgba(124,58,237,0.1);
+        }
+
+        /* Security code field highlight */
+        .security-field input {
+            border-color:#fcd34d;
+            background:#fffbeb;
+        }
+        .security-field input:focus {
+            border-color:#f59e0b;
+            box-shadow:0 0 0 3px rgba(245,158,11,0.15);
+        }
+        .security-field label {
+            color:#92400e !important;
+        }
+        .security-hint {
+            font-size:11px; color:#b45309; margin-top:4px;
+            display:flex; align-items:center; gap:4px;
+        }
+
+        /* Gender */
+        .gender-options {
+            display:flex; gap:8px; margin-top:2px;
+        }
+        .gender-option {
+            flex:1; border:2px solid #e5e7eb; border-radius:10px;
+            padding:9px 8px; cursor:pointer; transition:0.2s;
+            display:flex; align-items:center; justify-content:center;
+            gap:6px; font-size:12px; color:#374151;
+        }
+        .gender-option:has(input:checked) {
+            border-color:#7c3aed; background:#fdf4ff; color:#6d28d9;
+        }
+        .gender-option input { accent-color:#7c3aed; }
+
+        /* Divider */
+        .section-divider {
+            font-size:11px; font-weight:700; color:#94a3b8;
+            text-transform:uppercase; letter-spacing:1px;
+            margin:5px 0 15px;
+            display:flex; align-items:center; gap:10px;
+        }
+        .section-divider::after {
+            content:''; flex:1; height:1px; background:#f1f5f9;
+        }
+
+        .btn-submit {
+            width:100%; padding:14px;
+            background:linear-gradient(135deg, #7c3aed, #5b21b6);
+            color:white; border:none; border-radius:10px;
+            font-size:15px; font-weight:600; cursor:pointer;
+            transition:0.2s; margin-top:5px;
+        }
+        .btn-submit:hover {
+            transform:translateY(-1px);
+            box-shadow:0 8px 25px rgba(124,58,237,0.4);
+        }
+
+        .login-link {
+            text-align:center; font-size:13px;
+            color:#64748b; margin-top:14px;
+        }
+        .login-link a {
+            color:#7c3aed; font-weight:700; text-decoration:none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+
+    <!-- Left panel -->
+    <div class="left-panel">
+        <div class="admin-badge">🛡️ ADMIN REGISTRATION</div>
+        <h2>Create <span>Admin</span><br>Account</h2>
+        <p>Only authorized personnel with the correct security code can create an admin account.</p>
+
+        <div class="security-box">
+            <div class="sec-label">🔐 Security Code Required</div>
+            <div class="sec-note">You need the admin security code</div>
+            <div class="sec-desc">Contact your system administrator to get the code.</div>
+        </div>
+
+        <div class="requirement">
+            <div class="dot"></div>
+            Valid security code required
+        </div>
+        <div class="requirement">
+            <div class="dot"></div>
+            Unique username & email
+        </div>
+        <div class="requirement">
+            <div class="dot"></div>
+            Password minimum 4 characters
+        </div>
+        <div class="requirement">
+            <div class="dot"></div>
+            Full access to admin dashboard
+        </div>
+    </div>
+
+    <!-- Right panel -->
+    <div class="right-panel">
+        <h2>Admin Registration 🛡️</h2>
+        <p class="subtitle">Fill in all details to create your admin account</p>
+
+        <!-- Error alerts -->
+        <div class="alert alert-error" th:if="${signupError}">
+            ❌ <span th:text="${signupError}"></span>
+        </div>
+        <div class="alert alert-error" th:if="${passwordError}">
+            ❌ <span th:text="${passwordError}"></span>
+        </div>
+        <div class="alert alert-warning">
+            ⚠️ This page is for authorized admins only.
+            Wrong security code = account NOT created.
+        </div>
+
+        <form th:action="@{/users/admin/signup}"
+              method="POST"
+              th:object="${admin}">
+
+            <!-- Personal Info -->
+            <div class="section-divider">Personal Information</div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>First Name</label>
+                    <input type="text" th:field="*{firstname}"
+                           placeholder="First name" required>
+                </div>
+                <div class="form-group">
+                    <label>Last Name</label>
+                    <input type="text" th:field="*{lastname}"
+                           placeholder="Last name" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" th:field="*{username}"
+                       placeholder="Choose admin username" required>
+            </div>
+
+            <!-- Gender -->
+            <div class="form-group">
+                <label>Gender</label>
+                <div class="gender-options">
+                    <label class="gender-option">
+                        <input type="radio"
+                               th:field="*{gender}"
+                               value="MALE"> 👨 Male
+                    </label>
+                    <label class="gender-option">
+                        <input type="radio"
+                               th:field="*{gender}"
+                               value="FEMALE"> 👩 Female
+                    </label>
+                    <label class="gender-option">
+                        <input type="radio"
+                               th:field="*{gender}"
+                               value="OTHER"> 🧑 Other
+                    </label>
+                </div>
+            </div>
+
+            <!-- Account Info -->
+            <div class="section-divider">Account Information</div>
+
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" th:field="*{email}"
+                       placeholder="admin@example.com" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" th:field="*{password}"
+                           placeholder="Min 4 characters" required>
+                </div>
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <input type="password" th:field="*{confirmPassword}"
+                           placeholder="Repeat password" required>
+                </div>
+            </div>
+
+            <!-- Security Code -->
+            <div class="section-divider">Security Verification</div>
+
+            <div class="form-group security-field">
+                <label>🔐 Admin Security Code</label>
+                <input type="password"
+                       th:field="*{securityCode}"
+                       placeholder="Enter the admin security code"
+                       required>
+                <div class="security-hint">
+                    🔑 Enter the 4-digit security code provided by your administrator
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit">
+                🛡️ Create Admin Account
+            </button>
+        </form>
+
+        <p class="login-link">
+            Already have an account?
+            <a th:href="@{/users/admin/login}">Admin Login</a>
+        </p>
+    </div>
+
+</div>
+
+</body>
+</html>

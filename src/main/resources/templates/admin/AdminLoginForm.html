@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Login - Hiace Booking</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box;
+            font-family:'Segoe UI', sans-serif; }
+
+        body {
+            background:linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            display:flex; justify-content:center;
+            align-items:center; min-height:100vh;
+        }
+
+        .login-wrapper {
+            display:flex; width:820px; border-radius:20px;
+            overflow:hidden; box-shadow:0 25px 60px rgba(0,0,0,0.5);
+        }
+
+        /* Left panel */
+        .login-left {
+            background:linear-gradient(160deg, #7c3aed, #5b21b6);
+            width:360px; padding:50px 35px;
+            display:flex; flex-direction:column;
+            justify-content:center; color:white;
+        }
+        .admin-badge {
+            display:inline-flex; align-items:center; gap:8px;
+            background:rgba(255,255,255,0.15); padding:8px 16px;
+            border-radius:20px; font-size:12px; font-weight:600;
+            margin-bottom:25px; width:fit-content;
+        }
+        .login-left h1 {
+            font-size:30px; font-weight:800; margin-bottom:10px;
+        }
+        .login-left h1 span { color:#c4b5fd; }
+        .login-left p {
+            font-size:13px; color:rgba(255,255,255,0.7);
+            margin-bottom:35px; line-height:1.6;
+        }
+        .feature {
+            display:flex; align-items:center; gap:10px;
+            margin-bottom:16px;
+        }
+        .feature .icon {
+            width:36px; height:36px;
+            background:rgba(255,255,255,0.15);
+            border-radius:8px;
+            display:flex; align-items:center;
+            justify-content:center; font-size:16px;
+        }
+        .feature .text strong { display:block; font-size:13px; }
+        .feature .text span {
+            font-size:11px; color:rgba(255,255,255,0.6);
+        }
+
+        /* Right panel */
+        .login-right {
+            background:white; flex:1;
+            padding:50px 40px;
+            display:flex; flex-direction:column;
+            justify-content:center;
+        }
+        .login-right h2 {
+            font-size:24px; font-weight:700;
+            color:#1e293b; margin-bottom:5px;
+        }
+        .login-right .subtitle {
+            font-size:13px; color:#64748b; margin-bottom:30px;
+        }
+
+        /* Alerts */
+        .alert {
+            padding:12px 16px; border-radius:10px;
+            font-size:13px; margin-bottom:20px;
+            display:flex; align-items:center; gap:8px;
+        }
+        .alert-error {
+            background:#fdf4ff; border:1px solid #d8b4fe;
+            color:#7c3aed;
+        }
+        .alert-success {
+            background:#f0fdf4; border:1px solid #86efac;
+            color:#16a34a;
+        }
+
+        .form-group { margin-bottom:20px; }
+        .form-group label {
+            display:block; font-size:12px; font-weight:700;
+            color:#374151; margin-bottom:7px;
+            text-transform:uppercase; letter-spacing:0.5px;
+        }
+        .input-wrapper { position:relative; }
+        .input-icon {
+            position:absolute; left:14px; top:50%;
+            transform:translateY(-50%); font-size:16px; color:#94a3b8;
+        }
+        .form-group input {
+            width:100%; padding:13px 14px 13px 42px;
+            border:2px solid #e5e7eb; border-radius:10px;
+            font-size:14px; outline:none; transition:0.2s;
+            background:#fafafa;
+        }
+        .form-group input:focus {
+            border-color:#7c3aed; background:white;
+            box-shadow:0 0 0 3px rgba(124,58,237,0.1);
+        }
+
+        .btn-login {
+            width:100%; padding:14px;
+            background:linear-gradient(135deg, #7c3aed, #5b21b6);
+            color:white; border:none; border-radius:10px;
+            font-size:15px; font-weight:600; cursor:pointer;
+            transition:0.2s; letter-spacing:0.3px; margin-bottom:15px;
+        }
+        .btn-login:hover {
+            transform:translateY(-2px);
+            box-shadow:0 8px 25px rgba(124,58,237,0.4);
+        }
+
+        .divider {
+            text-align:center; margin:15px 0;
+            color:#94a3b8; font-size:13px; position:relative;
+        }
+        .divider::before, .divider::after {
+            content:''; position:absolute; top:50%;
+            width:38%; height:1px; background:#e5e7eb;
+        }
+        .divider::before { left:0; }
+        .divider::after { right:0; }
+
+        .signup-link {
+            text-align:center; font-size:13px; color:#64748b;
+        }
+        .signup-link a {
+            color:#7c3aed; font-weight:700; text-decoration:none;
+        }
+        .signup-link a:hover { text-decoration:underline; }
+
+        .back-link {
+            text-align:center; margin-top:12px;
+            font-size:12px; color:#94a3b8;
+        }
+        .back-link a { color:#64748b; text-decoration:none; }
+        .back-link a:hover { text-decoration:underline; }
+    </style>
+</head>
+<body>
+
+<div class="login-wrapper">
+
+    <!-- Left -->
+    <div class="login-left">
+        <div class="admin-badge">🛡️ Admin Portal</div>
+        <h1>Hiace <span>Admin</span><br>Panel</h1>
+        <p>Manage vehicles, routes, bookings and users from one powerful dashboard.</p>
+
+        <div class="feature">
+            <div class="icon">🚐</div>
+            <div class="text">
+                <strong>Manage Hiaces</strong>
+                <span>Add, edit, delete vehicles</span>
+            </div>
+        </div>
+        <div class="feature">
+            <div class="icon">🗺️</div>
+            <div class="text">
+                <strong>Manage Routes</strong>
+                <span>Set fares and schedules</span>
+            </div>
+        </div>
+        <div class="feature">
+            <div class="icon">📋</div>
+            <div class="text">
+                <strong>View Bookings</strong>
+                <span>Monitor all reservations</span>
+            </div>
+        </div>
+        <div class="feature">
+            <div class="icon">👥</div>
+            <div class="text">
+                <strong>User Management</strong>
+                <span>View all registered users</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right -->
+    <div class="login-right">
+        <h2>Admin Login 🛡️</h2>
+        <p class="subtitle">Sign in to access the admin dashboard</p>
+
+        <div class="alert alert-error" th:if="${param.error}">
+            ❌ Invalid username or password.
+        </div>
+        <div class="alert alert-success" th:if="${param.registered}">
+            ✅ Admin account created! Please login.
+        </div>
+
+        <!-- Spring Security handles this POST -->
+        <form th:action="@{/users/login}" method="POST">
+
+            <div class="form-group">
+                <label>Username</label>
+                <div class="input-wrapper">
+                    <span class="input-icon">🛡️</span>
+                    <input type="text" name="username"
+                           placeholder="Admin username"
+                           required autofocus>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <div class="input-wrapper">
+                    <span class="input-icon">🔒</span>
+                    <input type="password" name="password"
+                           placeholder="Admin password"
+                           required>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-login">
+                Login to Dashboard →
+            </button>
+        </form>
+
+        <div class="divider">or</div>
+
+        <p class="signup-link">
+            New admin?
+            <a th:href="@{/users/admin/signup}">
+                Create admin account
+            </a>
+        </p>
+
+        <p class="back-link">
+            <a th:href="@{/users/login}">← Back to User Login</a>
+        </p>
+    </div>
+
+</div>
+
+</body>
+</html>

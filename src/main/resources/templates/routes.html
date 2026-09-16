@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Routes - Hiace Booking</title>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary:   #1a56db;
+            --primary-dk:#1344b8;
+            --primary-lt:#e8f0fe;
+            --accent:    #f59e0b;
+            --success:   #10b981;
+            --dark:      #0f172a;
+            --dark2:     #1e293b;
+            --mid:       #64748b;
+            --light:     #f1f5f9;
+            --white:     #ffffff;
+            --radius:    14px;
+            --shadow:    0 4px 20px rgba(0,0,0,.08);
+            --shadow-md: 0 8px 30px rgba(0,0,0,.12);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        html { scroll-behavior:smooth; }
+        body {
+            font-family:'Segoe UI',system-ui,sans-serif;
+            background:#f8fafc; color:#1e293b;
+        }
+
+        /* ── NAVBAR (same as Home) ──────────────────── */
+        .navbar {
+            background:var(--white); padding:0 30px; height:64px;
+            display:flex; justify-content:space-between;
+            align-items:center;
+            box-shadow:0 2px 12px rgba(0,0,0,.08);
+            position:sticky; top:0; z-index:999;
+        }
+        .navbar-brand {
+            display:flex; align-items:center; gap:10px;
+            text-decoration:none;
+        }
+        .brand-logo {
+            width:40px; height:40px; border-radius:10px;
+            background:linear-gradient(135deg,var(--primary),#38bdf8);
+            display:flex; align-items:center; justify-content:center;
+            font-size:20px; color:white;
+        }
+        .brand-text { font-size:18px; font-weight:800; color:var(--dark); }
+        .brand-text span { color:var(--primary); }
+        .navbar-links { display:flex; align-items:center; gap:4px; }
+        .navbar-links a {
+            padding:8px 14px; border-radius:8px;
+            text-decoration:none; font-size:14px;
+            font-weight:500; color:var(--mid); transition:0.2s;
+        }
+        .navbar-links a:hover { background:var(--light); color:var(--dark); }
+        .navbar-links a.active {
+            background:var(--primary-lt); color:var(--primary); font-weight:700;
+        }
+        .navbar-links a.nav-hiace {
+            background:var(--primary); color:white !important;
+            font-weight:700; padding:9px 18px;
+        }
+        .navbar-links a.nav-hiace:hover { background:var(--primary-dk); }
+        .navbar-right { display:flex; align-items:center; gap:10px; }
+        .user-pill {
+            display:flex; align-items:center; gap:8px;
+            background:var(--light); padding:6px 14px;
+            border-radius:30px; font-size:13px; font-weight:600; color:var(--dark);
+        }
+        .user-pill .avatar {
+            width:28px; height:28px; border-radius:50%;
+            background:linear-gradient(135deg,var(--primary),#38bdf8);
+            color:white; display:flex; align-items:center;
+            justify-content:center; font-size:12px; font-weight:800;
+        }
+        .btn-logout {
+            padding:8px 16px;
+            background:linear-gradient(135deg,#ef4444,#dc2626);
+            color:white; border:none; border-radius:8px;
+            font-size:13px; font-weight:600; cursor:pointer;
+            text-decoration:none; display:flex; align-items:center; gap:6px;
+        }
+
+        /* ── HERO with illustration ─────────────────── */
+        .routes-hero {
+            position:relative; overflow:hidden;
+            background:linear-gradient(135deg,#0f172a,#1e3a5f,#1a56db);
+            padding:60px 20px 50px; text-align:center;
+        }
+        .routes-hero-svg {
+            position:absolute; inset:0; width:100%; height:100%;
+            opacity:0.35; z-index:0;
+        }
+        .routes-hero-content { position:relative; z-index:1; }
+        .routes-hero .htag {
+            display:inline-flex; align-items:center; gap:6px;
+            background:rgba(255,255,255,.1);
+            border:1px solid rgba(255,255,255,.18);
+            padding:6px 16px; border-radius:30px;
+            font-size:13px; color:rgba(255,255,255,.85); margin-bottom:18px;
+        }
+        .routes-hero h1 {
+            font-size:40px; font-weight:900; color:white; margin-bottom:10px;
+        }
+        .routes-hero p {
+            font-size:16px; color:rgba(255,255,255,.75);
+            max-width:520px; margin:0 auto;
+        }
+
+        /* ── SEARCH BAR ──────────────────────────────── */
+        .search-bar-wrap { background:white; padding:0 20px; }
+        .search-bar {
+            max-width:760px; margin:0 auto; transform:translateY(-26px);
+            background:white; border-radius:16px;
+            box-shadow:var(--shadow-md); padding:18px 22px;
+            border:1px solid #e2e8f0;
+            display:flex; gap:12px; align-items:center; flex-wrap:wrap;
+        }
+        .search-bar input {
+            flex:1; min-width:180px; padding:11px 16px;
+            border:2px solid #e5e7eb; border-radius:10px;
+            font-size:14px; outline:none; transition:0.2s;
+        }
+        .search-bar input:focus { border-color:var(--primary); }
+        .search-bar button {
+            padding:11px 22px;
+            background:linear-gradient(135deg,var(--primary),#2563eb);
+            color:white; border:none; border-radius:10px;
+            font-size:14px; font-weight:700; cursor:pointer;
+            display:flex; align-items:center; gap:7px;
+        }
+
+        /* ── SECTION ─────────────────────────────────── */
+        .section { padding:30px 20px 70px; }
+        .inner { max-width:1200px; margin:0 auto; }
+        .section-head { text-align:center; margin-bottom:40px; }
+        .section-head h2 {
+            font-size:28px; font-weight:800; color:var(--dark); margin-bottom:10px;
+        }
+        .section-head p { font-size:14px; color:var(--mid); }
+        .r-count {
+            display:inline-block; margin-top:14px;
+            background:var(--primary-lt); color:var(--primary);
+            padding:6px 16px; border-radius:20px;
+            font-size:13px; font-weight:700;
+        }
+
+        /* ── ROUTE GROUP CARDS ───────────────────────── */
+        .route-groups-grid {
+            display:grid;
+            grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+            gap:22px;
+        }
+        .route-group-card {
+            background:white; border-radius:var(--radius);
+            overflow:hidden; transition:0.3s;
+            border:2px solid #f1f5f9; box-shadow:var(--shadow);
+            text-decoration:none; display:block; color:inherit;
+        }
+        .route-group-card:hover {
+            transform:translateY(-6px);
+            box-shadow:var(--shadow-md); border-color:var(--primary);
+        }
+
+        .rg-image-wrap {
+            position:relative; height:150px; overflow:hidden;
+            background:linear-gradient(135deg,#0f172a,#1e3a5f,#1a56db);
+        }
+        .rg-image-wrap img {
+            width:100%; height:100%; object-fit:cover;
+            opacity:0.55;
+        }
+        .rg-image-wrap .rg-route-overlay {
+            position:absolute; inset:0;
+            display:flex; flex-direction:column;
+            align-items:center; justify-content:center;
+            text-align:center; padding:14px;
+        }
+        .rg-route-overlay .rg-from-to {
+            display:flex; align-items:center; gap:10px;
+            color:white; font-size:20px; font-weight:800;
+        }
+        .rg-route-overlay .rg-from-to i {
+            color:#38bdf8; font-size:16px;
+        }
+        .rg-count-badge {
+            position:absolute; top:12px; right:12px;
+            background:rgba(0,0,0,.45); color:white;
+            padding:5px 12px; border-radius:20px;
+            font-size:11px; font-weight:700;
+            display:flex; align-items:center; gap:5px;
+            backdrop-filter:blur(4px);
+        }
+
+        .rg-body { padding:18px 20px; }
+        .rg-meta-row {
+            display:flex; justify-content:space-between;
+            align-items:center; margin-bottom:12px;
+        }
+        .rg-fare-range {
+            font-size:13px; color:var(--mid);
+        }
+        .rg-fare-range strong {
+            color:var(--success); font-size:16px; font-weight:800;
+        }
+        .rg-cat-tags { display:flex; gap:6px; flex-wrap:wrap; }
+        .rg-cat-tag {
+            font-size:10px; font-weight:800; padding:3px 9px;
+            border-radius:20px;
+        }
+        .rg-cat-tag.DELUXE { background:#fef3c7; color:#92400e; }
+        .rg-cat-tag.NORMAL { background:#d1fae5; color:#065f46; }
+
+        .rg-next-date {
+            display:flex; align-items:center; gap:7px;
+            font-size:12px; color:#166534; font-weight:600;
+            background:#f0fdf4; padding:8px 12px;
+            border-radius:9px; margin-bottom:14px;
+        }
+
+        .rg-cta {
+            display:flex; align-items:center; justify-content:center; gap:7px;
+            padding:11px; background:linear-gradient(135deg,var(--primary),#2563eb);
+            color:white; border-radius:10px; font-size:13px; font-weight:700;
+        }
+        .route-group-card:hover .rg-cta {
+            background:linear-gradient(135deg,var(--primary-dk),#1d4ed8);
+        }
+
+        .empty-state {
+            grid-column:1/-1; text-align:center; padding:60px;
+            background:white; border-radius:var(--radius);
+            border:2px dashed #e2e8f0;
+        }
+        .empty-state i { font-size:48px; color:#cbd5e1; display:block; margin-bottom:14px; }
+
+        @media(max-width:640px) {
+            .navbar-links { display:none; }
+            .routes-hero h1 { font-size:28px; }
+            .search-bar { flex-direction:column; align-items:stretch; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+    <a href="/home" class="navbar-brand">
+        <div class="brand-logo">🚐</div>
+        <div class="brand-text">Hiace<span>Booking</span></div>
+    </a>
+    <div class="navbar-links">
+        <a th:href="@{/routes}" class="active">
+            <i class="fas fa-route"></i> Routes
+        </a>
+                <a th:href="@{/hiaces/list}"><i class="fas fa-shuttle-van"></i> View Hiaces</a>
+        
+        <a th:href="@{/hiaces}" class="nav-hiace">
+            <i class="fas fa-shuttle-van"></i> View Hiaces &amp; Book
+        </a>
+        <a th:href="@{/booking/my-bookings}">
+            <i class="fas fa-ticket-alt"></i> My Bookings
+        </a>
+        <a th:href="@{/home}">
+            <i class="fas fa-home"></i> Home
+        </a>
+    </div>
+    <div class="navbar-right">
+        <div class="user-pill">
+            <div class="avatar"
+                 th:text="${#strings.substring(#authentication.name,0,1).toUpperCase()}">
+            </div>
+            <span th:text="${#authentication.name}"></span>
+        </div>
+        <a th:href="@{/users/logout}" class="btn-logout">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="routes-hero">
+    <object class="routes-hero-svg" data="/images/hiace-hero-illustration.svg" type="image/svg+xml"></object>
+    <div class="routes-hero-content">
+        <div class="htag"><i class="fas fa-route"></i> All Available Routes</div>
+        <h1>Where would you like to go?</h1>
+        <p>Browse every route we operate — pick one to see all the Hiaces travelling that way</p>
+    </div>
+</section>
+
+<!-- SEARCH -->
+<div class="search-bar-wrap">
+    <form class="search-bar" th:action="@{/routes}" method="GET">
+        <input type="text" name="source"
+               placeholder="From (e.g. Kathmandu)"
+               th:value="${selectedSource}">
+        <input type="text" name="destination"
+               placeholder="To (e.g. Jhapa)"
+               th:value="${selectedDestination}">
+        <button type="submit">
+            <i class="fas fa-search"></i> Find Routes
+        </button>
+    </form>
+</div>
+
+<!-- ROUTE GROUPS -->
+<section class="section">
+    <div class="inner">
+        <div class="section-head">
+            <h2>Available Routes</h2>
+            <p>Each card represents one source-to-destination route. Click a route to see every Hiace running on it.</p>
+            <span class="r-count"
+                  th:text="${routeGroups.size()} + ' unique route(s) found'">
+            </span>
+        </div>
+
+        <div class="route-groups-grid">
+
+            <div th:if="${#lists.isEmpty(routeGroups)}" class="empty-state">
+                <i class="fas fa-route"></i>
+                <p style="font-size:16px;font-weight:700;color:var(--dark);">
+                    No routes match your search.
+                </p>
+                <p style="color:var(--mid);margin-top:6px;">Try a different source or destination.</p>
+            </div>
+
+            <a th:each="grp : ${routeGroups}"
+               th:href="@{/hiaces(source=${grp.source},destination=${grp.destination})}"
+               class="route-group-card">
+
+                <div class="rg-image-wrap">
+                    <img th:if="${grp.imageName != null}"
+                         th:src="@{'/uploads/' + ${grp.imageName}}"
+                         th:alt="${grp.source} + ' to ' + ${grp.destination}">
+                    <div class="rg-route-overlay">
+                        <div class="rg-from-to">
+                            <span th:text="${grp.source}"></span>
+                            <i class="fas fa-long-arrow-alt-right"></i>
+                            <span th:text="${grp.destination}"></span>
+                        </div>
+                    </div>
+                    <div class="rg-count-badge">
+                        <i class="fas fa-shuttle-van"></i>
+                        <span th:text="${grp.hiaceCount} + ' hiace(s)'"></span>
+                    </div>
+                </div>
+
+                <div class="rg-body">
+                    <div class="rg-meta-row">
+                        <div class="rg-fare-range">
+                            From <strong th:text="'Rs. ' + ${grp.minFare}"></strong>
+                        </div>
+                        <div class="rg-cat-tags">
+                            <span th:each="cat : ${grp.categories}"
+                                  class="rg-cat-tag"
+                                  th:classappend="${cat}"
+                                  th:text="${cat}">
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="rg-next-date" th:if="${grp.nextDate != null}">
+                        <i class="fas fa-calendar-alt"></i>
+                        Next departure:
+                        <strong th:text="${#temporals.format(grp.nextDate,'dd MMM yyyy')}"></strong>
+                    </div>
+
+                    <div class="rg-cta">
+                        <i class="fas fa-shuttle-van"></i>
+                        View Hiaces on this route
+                    </div>
+                </div>
+            </a>
+
+        </div>
+    </div>
+</section>
+
+</body>
+</html>

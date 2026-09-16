@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Hiace Reviews</title>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box;
+            font-family:'Segoe UI', sans-serif; }
+        body { background:#f0f2f5; padding:25px 20px; }
+
+        .container { max-width:800px; margin:0 auto; }
+
+        .back-btn {
+            display:inline-flex; align-items:center; gap:6px;
+            color:#64748b; text-decoration:none; font-size:14px;
+            margin-bottom:20px; font-weight:600;
+        }
+        .back-btn:hover { color:#1e293b; }
+
+        /* Summary card */
+        .summary-card {
+            background:white; border-radius:16px;
+            padding:28px; margin-bottom:22px;
+            box-shadow:0 2px 10px rgba(0,0,0,.07);
+            display:flex; gap:30px; align-items:center;
+            flex-wrap:wrap;
+        }
+        .avg-rating-box { text-align:center; }
+        .avg-number {
+            font-size:56px; font-weight:900;
+            color:#1e293b; line-height:1;
+        }
+        .avg-stars { font-size:22px; color:#fbbf24;
+                     margin:6px 0; }
+        .avg-count { font-size:13px; color:#64748b; }
+
+        .rating-bars { flex:1; min-width:200px; }
+        .bar-row {
+            display:flex; align-items:center; gap:10px;
+            margin-bottom:8px;
+        }
+        .bar-label {
+            font-size:13px; color:#64748b;
+            width:40px; text-align:right; flex-shrink:0;
+        }
+        .bar-track {
+            flex:1; height:10px; background:#f1f5f9;
+            border-radius:5px; overflow:hidden;
+        }
+        .bar-fill {
+            height:100%; background:linear-gradient(
+                135deg,#fbbf24,#f59e0b);
+            border-radius:5px; transition:0.5s;
+        }
+        .bar-count {
+            font-size:12px; color:#94a3b8;
+            width:25px; flex-shrink:0;
+        }
+
+        /* Review cards */
+        .reviews-header {
+            font-size:18px; font-weight:800; color:#1e293b;
+            margin-bottom:16px;
+            display:flex; align-items:center; gap:8px;
+        }
+
+        .review-card {
+            background:white; border-radius:14px;
+            padding:22px; margin-bottom:14px;
+            box-shadow:0 2px 8px rgba(0,0,0,.06);
+            border-left:4px solid #fbbf24;
+        }
+        .review-top {
+            display:flex; justify-content:space-between;
+            align-items:flex-start; margin-bottom:12px;
+        }
+        .reviewer-info {
+            display:flex; align-items:center; gap:10px;
+        }
+        .reviewer-avatar {
+            width:40px; height:40px; border-radius:50%;
+            background:linear-gradient(135deg,#f59e0b,#d97706);
+            color:white; display:flex; align-items:center;
+            justify-content:center; font-weight:800;
+            font-size:16px; flex-shrink:0;
+        }
+        .reviewer-name {
+            font-size:14px; font-weight:700; color:#1e293b;
+        }
+        .review-date {
+            font-size:12px; color:#94a3b8; margin-top:2px;
+        }
+        .review-stars {
+            color:#fbbf24; font-size:18px;
+        }
+        .review-comment {
+            font-size:14px; color:#374151;
+            line-height:1.6;
+        }
+        .review-route {
+            display:inline-flex; align-items:center; gap:5px;
+            background:#f0f9ff; color:#0369a1;
+            padding:3px 10px; border-radius:20px;
+            font-size:11px; font-weight:600;
+            margin-top:10px;
+        }
+
+        .empty-state {
+            text-align:center; padding:60px;
+            background:white; border-radius:16px;
+            color:#94a3b8;
+        }
+        .empty-state .ei {
+            font-size:48px; display:block;
+            margin-bottom:12px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <a th:href="@{/hiaces}" class="back-btn">
+        ← Back to Hiaces
+    </a>
+
+    <!-- Rating Summary -->
+    <div class="summary-card">
+        <div class="avg-rating-box">
+            <div class="avg-number"
+                 th:text="${avgRating}">0</div>
+            <div class="avg-stars">
+                <span th:each="i : ${#numbers.sequence(1,5)}"
+                      th:text="${i <= avgRating} ? '★' : '☆'">
+                </span>
+            </div>
+            <div class="avg-count"
+                 th:text="${reviewCount} +
+                 ' review(s)'">
+            </div>
+        </div>
+
+        <!-- Rating bars -->
+        <div class="rating-bars">
+            <div class="bar-row"
+                 th:each="entry : ${distribution}">
+                <div class="bar-label"
+                     th:text="${entry.key} + '★'">
+                </div>
+                <div class="bar-track">
+                    <div class="bar-fill"
+                         th:style="'width:' +
+                         (${reviewCount} > 0 ?
+                         ${entry.value * 100 / reviewCount}
+                         : 0) + '%'">
+                    </div>
+                </div>
+                <div class="bar-count"
+                     th:text="${entry.value}">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reviews list -->
+    <div class="reviews-header">
+        ⭐ Customer Reviews
+        <span style="font-size:14px;color:#64748b;
+                     font-weight:400;"
+              th:text="'(' + ${reviewCount} + ' total)'">
+        </span>
+    </div>
+
+    <div th:if="${#lists.isEmpty(reviews)}"
+         class="empty-state">
+        <span class="ei">⭐</span>
+        <p>No reviews yet for this Hiace.</p>
+        <p style="font-size:13px;margin-top:6px;">
+            Be the first to leave a review!
+        </p>
+    </div>
+
+    <div th:each="r : ${reviews}" class="review-card">
+        <div class="review-top">
+            <div class="reviewer-info">
+                <div class="reviewer-avatar"
+                     th:text="${#strings.substring(
+                     r.user.firstname,0,1)}">
+                </div>
+                <div>
+                    <div class="reviewer-name"
+                         th:text="${r.user.firstname}+
+                         ' '+${r.user.lastname}">
+                    </div>
+                    <div class="review-date"
+                         th:text="${#temporals.format(
+                         r.reviewDate,
+                         'dd MMM yyyy')}">
+                    </div>
+                </div>
+            </div>
+            <div class="review-stars">
+                <span th:each="i :
+                      ${#numbers.sequence(1,5)}"
+                      th:text="${i <= r.rating}
+                                ? '★' : '☆'">
+                </span>
+            </div>
+        </div>
+
+        <p class="review-comment"
+           th:text="${r.comment}">
+        </p>
+
+        <div class="review-route"
+             th:if="${r.booking != null}">
+            <i class="fas fa-route"></i>
+            <span th:text="${r.booking.route.source}+
+                  ' → '+${r.booking.route.destination}">
+            </span>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

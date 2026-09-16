@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Signup - Hiace Booking</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box;
+            font-family:'Segoe UI', sans-serif; }
+
+        body {
+            background:linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            display:flex; justify-content:center;
+            align-items:center; min-height:100vh; padding:30px 20px;
+        }
+
+        .signup-wrapper {
+            display:flex; width:900px; border-radius:20px;
+            overflow:hidden; box-shadow:0 25px 60px rgba(0,0,0,0.4);
+        }
+
+        /* Left panel */
+        .signup-left {
+            background:linear-gradient(160deg, #059669, #047857);
+            width:340px; padding:50px 35px;
+            display:flex; flex-direction:column;
+            justify-content:center; color:white;
+        }
+        .signup-left .brand {
+            font-size:28px; font-weight:800; margin-bottom:10px;
+        }
+        .signup-left .brand span { font-size:32px; }
+        .signup-left p {
+            font-size:14px; color:rgba(255,255,255,0.75);
+            margin-bottom:35px; line-height:1.6;
+        }
+        .step {
+            display:flex; align-items:center; gap:12px;
+            margin-bottom:18px;
+        }
+        .step .num {
+            width:32px; height:32px; border-radius:50%;
+            background:rgba(255,255,255,0.2);
+            display:flex; align-items:center; justify-content:center;
+            font-size:14px; font-weight:700; flex-shrink:0;
+        }
+        .step .text strong { display:block; font-size:13px; }
+        .step .text span {
+            font-size:11px; color:rgba(255,255,255,0.65);
+        }
+
+        /* Right panel */
+        .signup-right {
+            background:white; flex:1;
+            padding:40px 35px;
+            display:flex; flex-direction:column;
+            justify-content:center; overflow-y:auto;
+        }
+        .signup-right h2 {
+            font-size:24px; font-weight:700; color:#1e293b;
+            margin-bottom:5px;
+        }
+        .signup-right .subtitle {
+            font-size:13px; color:#64748b; margin-bottom:25px;
+        }
+
+        /* Alerts */
+        .alert {
+            padding:12px 16px; border-radius:10px;
+            font-size:13px; margin-bottom:16px;
+            display:flex; align-items:center; gap:8px;
+        }
+        .alert-error {
+            background:#fff5f5; border:1px solid #fca5a5; color:#dc2626;
+        }
+
+        /* Form rows */
+        .form-row {
+            display:grid; grid-template-columns:1fr 1fr; gap:14px;
+        }
+        .form-group { margin-bottom:15px; }
+        .form-group label {
+            display:block; font-size:12px; font-weight:600;
+            color:#374151; margin-bottom:6px; text-transform:uppercase;
+            letter-spacing:0.5px;
+        }
+        .form-group input {
+            width:100%; padding:11px 14px;
+            border:2px solid #e5e7eb; border-radius:10px;
+            font-size:14px; outline:none; transition:0.2s;
+            background:#fafafa;
+        }
+        .form-group input:focus {
+            border-color:#059669; background:white;
+            box-shadow:0 0 0 3px rgba(5,150,105,0.1);
+        }
+
+        /* Gender radio */
+        .gender-options {
+            display:flex; gap:10px; margin-top:2px;
+        }
+        .gender-option {
+            flex:1; border:2px solid #e5e7eb; border-radius:10px;
+            padding:10px; cursor:pointer; transition:0.2s;
+            display:flex; align-items:center; gap:8px;
+            font-size:13px; color:#374151;
+        }
+        .gender-option:has(input:checked) {
+            border-color:#059669; background:#f0fdf4; color:#065f46;
+        }
+        .gender-option input { accent-color:#059669; }
+
+        .btn-signup {
+            width:100%; padding:14px; background:#059669;
+            color:white; border:none; border-radius:10px;
+            font-size:15px; font-weight:600; cursor:pointer;
+            transition:0.2s; margin-top:5px;
+        }
+        .btn-signup:hover {
+            background:#047857; transform:translateY(-1px);
+            box-shadow:0 8px 25px rgba(5,150,105,0.35);
+        }
+
+        .login-link {
+            text-align:center; font-size:13px;
+            color:#64748b; margin-top:15px;
+        }
+        .login-link a {
+            color:#059669; font-weight:700; text-decoration:none;
+        }
+        .login-link a:hover { text-decoration:underline; }
+
+        /* Password strength hint */
+        .hint {
+            font-size:11px; color:#94a3b8; margin-top:4px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="signup-wrapper">
+
+    <!-- Left panel: informational only, no form fields here -->
+    <div class="signup-left">
+        <div class="brand"><span>🚐</span> Hiace<br>Booking</div>
+        <p>Create your account and start booking Hiace seats online in minutes.</p>
+
+        <div class="step">
+            <div class="num">1</div>
+            <div class="text">
+                <strong>Create Account</strong>
+                <span>Fill in your details below</span>
+            </div>
+        </div>
+        <div class="step">
+            <div class="num">2</div>
+            <div class="text">
+                <strong>Login</strong>
+                <span>Use your username &amp; password</span>
+            </div>
+        </div>
+        <div class="step">
+            <div class="num">3</div>
+            <div class="text">
+                <strong>Book Your Seat</strong>
+                <span>Choose route &amp; pay with eSewa</span>
+            </div>
+        </div>
+        <div class="step">
+            <div class="num">4</div>
+            <div class="text">
+                <strong>Get Confirmation</strong>
+                <span>Email notification sent instantly</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right panel -->
+    <div class="signup-right">
+        <h2>Create Account 🎉</h2>
+        <p class="subtitle">Join Hiace Booking System today</p>
+
+        <!-- Error alerts -->
+        <div class="alert alert-error"
+             th:if="${signupError}">
+            ❌ <span th:text="${signupError}"></span>
+        </div>
+
+        <div class="alert alert-error"
+             th:if="${passwordError}">
+            ❌ <span th:text="${passwordError}"></span>
+        </div>
+
+        <form th:action="@{/users/signup}"
+              method="POST"
+              th:object="${user}">
+
+            <!-- Name row -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label>First Name</label>
+                    <input type="text"
+                           th:field="*{firstname}"
+                           placeholder="Robis"
+                           required>
+                </div>
+                <div class="form-group">
+                    <label>Last Name</label>
+                    <input type="text"
+                           th:field="*{lastname}"
+                           placeholder="Niroula"
+                           required>
+                </div>
+            </div>
+
+            <!-- Username -->
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text"
+                       th:field="*{username}"
+                       placeholder="Choose a unique username"
+                       required>
+            </div>
+
+            <!-- Phone (moved inside the form, bound to *{phone}) -->
+            <div class="form-group">
+                <label>Phone Number</label>
+                <input type="text"
+                       th:field="*{phone}"
+                       placeholder="e.g. 98XXXXXXXX"
+                       required>
+            </div>
+
+            <!-- Gender -->
+            <div class="form-group">
+                <label>Gender</label>
+                <div class="gender-options">
+                    <label class="gender-option">
+                        <input type="radio"
+                               th:field="*{gender}"
+                               value="MALE"> 👨 Male
+                    </label>
+                    <label class="gender-option">
+                        <input type="radio"
+                               th:field="*{gender}"
+                               value="FEMALE"> 👩 Female
+                    </label>
+                    <label class="gender-option">
+                        <input type="radio"
+                               th:field="*{gender}"
+                               value="OTHER"> 🧑 Other
+                    </label>
+                </div>
+            </div>
+
+            <!-- Email -->
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email"
+                       th:field="*{email}"
+                       placeholder="yourname@gmail.com"
+                       required>
+            </div>
+
+            <!-- Password row -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password"
+                           th:field="*{password}"
+                           placeholder="Min 4 characters"
+                           required>
+                    <p class="hint">4–8 characters</p>
+                </div>
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <input type="password"
+                           th:field="*{confirmPassword}"
+                           placeholder="Repeat password"
+                           required>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-signup">
+                Create Account →
+            </button>
+        </form>
+
+        <p class="login-link">
+            Already have an account?
+            <a th:href="@{/users/login}">Login here</a>
+        </p>
+    </div>
+
+</div>
+
+</body>
+</html>

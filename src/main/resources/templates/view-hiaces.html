@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Hiaces - Hiace Booking</title>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary:   #1a56db;
+            --primary-dk:#1344b8;
+            --primary-lt:#e8f0fe;
+            --accent:    #f59e0b;
+            --success:   #10b981;
+            --dark:      #0f172a;
+            --dark2:     #1e293b;
+            --mid:       #64748b;
+            --light:     #f1f5f9;
+            --white:     #ffffff;
+            --radius:    14px;
+            --shadow:    0 4px 20px rgba(0,0,0,.08);
+            --shadow-md: 0 8px 30px rgba(0,0,0,.12);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        html { scroll-behavior:smooth; }
+        body {
+            font-family:'Segoe UI',system-ui,sans-serif;
+            background:#f8fafc; color:#1e293b;
+        }
+
+        /* ── NAVBAR ─────────────────────────────────── */
+        .navbar {
+            background:var(--white); padding:0 30px; height:64px;
+            display:flex; justify-content:space-between;
+            align-items:center;
+            box-shadow:0 2px 12px rgba(0,0,0,.08);
+            position:sticky; top:0; z-index:999;
+        }
+        .navbar-brand {
+            display:flex; align-items:center; gap:10px;
+            text-decoration:none;
+        }
+        .brand-logo {
+            width:40px; height:40px; border-radius:10px;
+            background:linear-gradient(135deg,var(--primary),#38bdf8);
+            display:flex; align-items:center; justify-content:center;
+            font-size:20px; color:white;
+        }
+        .brand-text { font-size:18px; font-weight:800; color:var(--dark); }
+        .brand-text span { color:var(--primary); }
+
+        .navbar-links { display:flex; align-items:center; gap:4px; }
+        .navbar-links a {
+            padding:8px 14px; border-radius:8px;
+            text-decoration:none; font-size:14px;
+            font-weight:500; color:var(--mid); transition:0.2s;
+        }
+        .navbar-links a:hover { background:var(--light); color:var(--dark); }
+        .navbar-links a.active {
+            background:var(--primary-lt); color:var(--primary); font-weight:700;
+        }
+        .navbar-links a.nav-hiace {
+            background:var(--primary); color:white !important;
+            font-weight:700; padding:9px 18px;
+            box-shadow:0 4px 12px rgba(26,86,219,.25);
+        }
+        .navbar-links a.nav-hiace:hover { background:var(--primary-dk); }
+
+        .navbar-right { display:flex; align-items:center; gap:10px; }
+        .user-pill {
+            display:flex; align-items:center; gap:8px;
+            background:var(--light); padding:6px 14px;
+            border-radius:30px; font-size:13px;
+            font-weight:600; color:var(--dark);
+        }
+        .user-pill .avatar {
+            width:28px; height:28px; border-radius:50%;
+            background:linear-gradient(135deg,var(--primary),#38bdf8);
+            color:white; display:flex; align-items:center;
+            justify-content:center; font-size:12px; font-weight:800;
+        }
+        .btn-logout {
+            padding:8px 16px;
+            background:linear-gradient(135deg,#ef4444,#dc2626);
+            color:white; border:none; border-radius:8px;
+            font-size:13px; font-weight:600; cursor:pointer;
+            text-decoration:none; display:flex;
+            align-items:center; gap:6px; transition:0.2s;
+        }
+        .btn-logout:hover {
+            transform:translateY(-1px);
+            box-shadow:0 4px 14px rgba(239,68,68,.35);
+        }
+
+        /* ── HERO ───────────────────────────────────── */
+        .hero {
+            background:linear-gradient(135deg,#0f172a,#1e3a5f,#1a56db);
+            padding:55px 20px 50px; text-align:center;
+            position:relative; overflow:hidden;
+        }
+        .hero::before {
+            content:''; position:absolute;
+            top:-80px; right:-80px; width:360px; height:360px;
+            border-radius:50%; background:rgba(56,189,248,.06);
+        }
+        .hero::after {
+            content:''; position:absolute;
+            bottom:-60px; left:-60px; width:260px; height:260px;
+            border-radius:50%; background:rgba(245,158,11,.05);
+        }
+        .hero-content { position:relative; z-index:1; }
+        .hero-badge {
+            display:inline-flex; align-items:center; gap:6px;
+            background:rgba(255,255,255,.1);
+            border:1px solid rgba(255,255,255,.18);
+            padding:6px 16px; border-radius:30px;
+            font-size:13px; color:rgba(255,255,255,.85);
+            margin-bottom:16px;
+        }
+        .hero-badge .live-dot {
+            width:8px; height:8px; border-radius:50%;
+            background:#10b981; animation:pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%,100% { opacity:1; transform:scale(1); }
+            50%      { opacity:.5; transform:scale(1.3); }
+        }
+        .hero h1 {
+            font-size:38px; font-weight:900; color:white;
+            margin-bottom:10px;
+        }
+        .hero h1 span {
+            background:linear-gradient(135deg,#38bdf8,#818cf8);
+            -webkit-background-clip:text;
+            -webkit-text-fill-color:transparent;
+            background-clip:text;
+        }
+        .hero p {
+            font-size:15px; color:rgba(255,255,255,.75);
+            max-width:480px; margin:0 auto;
+        }
+
+        /* ── FILTER CARD ─────────────────────────────── */
+        .filter-wrap {
+            background:transparent; padding:0 20px;
+        }
+        .filter-card {
+            background:white; border-radius:18px;
+            box-shadow:var(--shadow-md);
+            padding:24px 28px;
+            max-width:1100px; margin:-36px auto 0;
+            border:1px solid #e2e8f0;
+            position:relative; z-index:10;
+        }
+        .filter-card-top {
+            display:flex; align-items:center; gap:8px;
+            margin-bottom:18px;
+        }
+        .filter-card-top h3 {
+            font-size:15px; font-weight:700; color:var(--dark);
+        }
+        .filter-card-top i { color:var(--primary); }
+
+        .filter-grid {
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+            gap:14px; align-items:end;
+        }
+        .fg-group label {
+            display:block; font-size:11px; font-weight:700;
+            color:var(--mid); text-transform:uppercase;
+            letter-spacing:0.5px; margin-bottom:7px;
+        }
+        .fg-group select {
+            width:100%; padding:11px 14px;
+            border:2px solid #e5e7eb; border-radius:10px;
+            font-size:14px; outline:none; transition:0.2s;
+            background:#fafafa; color:var(--dark);
+            appearance:none;
+            background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat:no-repeat;
+            background-position:right 14px center;
+            padding-right:38px;
+        }
+        .fg-group select:focus {
+            border-color:var(--primary); background-color:white;
+            box-shadow:0 0 0 3px rgba(26,86,219,.08);
+        }
+        .btn-search {
+            width:100%; padding:12px 20px;
+            background:linear-gradient(135deg,var(--primary),#2563eb);
+            color:white; border:none; border-radius:10px;
+            font-size:14px; font-weight:700; cursor:pointer;
+            transition:0.2s; display:flex;
+            align-items:center; justify-content:center; gap:7px;
+        }
+        .btn-search:hover {
+            transform:translateY(-2px);
+            box-shadow:0 6px 18px rgba(26,86,219,.35);
+        }
+        .btn-clear {
+            width:100%; padding:11px;
+            background:var(--light); color:var(--mid);
+            border:none; border-radius:10px; font-size:13px;
+            font-weight:600; cursor:pointer; transition:0.2s;
+            text-decoration:none; display:flex;
+            align-items:center; justify-content:center; gap:6px;
+        }
+        .btn-clear:hover { background:#e2e8f0; color:var(--dark); }
+
+        /* Active filter chips */
+        .active-chips {
+            display:flex; flex-wrap:wrap; gap:8px;
+            margin-top:16px;
+        }
+        .chip {
+            display:inline-flex; align-items:center; gap:6px;
+            background:var(--primary-lt); color:var(--primary);
+            padding:5px 12px; border-radius:20px;
+            font-size:12px; font-weight:700;
+        }
+
+        /* ── RESULTS HEADER ──────────────────────────── */
+        .results-header {
+            max-width:1100px; margin:30px auto 18px;
+            padding:0 20px;
+            display:flex; justify-content:space-between;
+            align-items:center; flex-wrap:wrap; gap:12px;
+        }
+        .results-header h2 {
+            font-size:20px; font-weight:800; color:var(--dark);
+            display:flex; align-items:center; gap:8px;
+        }
+        .results-count {
+            background:white; padding:7px 16px;
+            border-radius:20px; font-size:13px;
+            color:var(--mid); font-weight:600;
+            box-shadow:var(--shadow); border:1px solid #e2e8f0;
+        }
+
+        /* ── HIACE CARDS GRID ────────────────────────── */
+        .hiaces-grid {
+            display:grid;
+            grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+            gap:22px;
+            max-width:1100px; margin:0 auto;
+            padding:0 20px 60px;
+        }
+
+        .hiace-card {
+            background:white; border-radius:var(--radius);
+            overflow:hidden; transition:0.3s;
+            border:2px solid #f1f5f9; box-shadow:var(--shadow);
+            display:flex; flex-direction:column;
+        }
+        .hiace-card:hover {
+            transform:translateY(-6px);
+            box-shadow:var(--shadow-md); border-color:var(--primary);
+        }
+
+        /* Image area */
+        .hc-img-wrap { position:relative; }
+        .hc-img {
+            width:100%; height:190px; object-fit:cover; display:block;
+        }
+        .hc-img-placeholder {
+            width:100%; height:190px;
+            background:linear-gradient(135deg,#dbeafe,#eff6ff);
+            display:flex; flex-direction:column;
+            align-items:center; justify-content:center;
+            color:#3b82f6; font-size:48px;
+        }
+        .hc-img-placeholder span {
+            font-size:13px; color:#60a5fa;
+            margin-top:8px; font-weight:600;
+        }
+        .hc-cat-badge {
+            position:absolute; top:12px; right:12px;
+            padding:5px 13px; border-radius:20px;
+            font-size:11px; font-weight:800;
+            backdrop-filter:blur(8px);
+        }
+        .hc-cat-badge.DELUXE {
+            background:rgba(254,243,199,.92); color:#92400e;
+        }
+        .hc-cat-badge.NORMAL {
+            background:rgba(209,250,229,.92); color:#065f46;
+        }
+        .hc-rating-badge {
+            position:absolute; bottom:12px; left:12px;
+            background:rgba(0,0,0,.55); color:white;
+            padding:4px 11px; border-radius:20px;
+            font-size:12px; font-weight:700;
+            display:flex; align-items:center; gap:5px;
+            backdrop-filter:blur(4px);
+        }
+        .hc-rating-badge i { color:#fbbf24; }
+
+        /* Card body */
+        .hc-body { padding:18px 20px; flex:1;
+                   display:flex; flex-direction:column; }
+        .hc-top {
+            display:flex; justify-content:space-between;
+            align-items:flex-start; margin-bottom:10px;
+        }
+        .hc-vehicle {
+            font-size:17px; font-weight:800; color:var(--dark);
+        }
+        .hc-fare {
+            font-size:18px; font-weight:900; color:var(--success);
+            white-space:nowrap;
+        }
+        .hc-fare small {
+            font-size:11px; font-weight:400; color:var(--mid);
+        }
+
+        /* Meta row */
+        .hc-meta {
+            display:flex; gap:14px; margin-bottom:13px; flex-wrap:wrap;
+        }
+        .hc-meta span {
+            font-size:12px; color:var(--mid);
+            display:flex; align-items:center; gap:5px;
+        }
+
+        /* Route info box */
+        .hc-route {
+            background:var(--light); border-radius:10px;
+            padding:11px 14px; margin-bottom:14px; flex:1;
+        }
+        .hc-route-line {
+            display:flex; align-items:center; gap:8px;
+            font-weight:700; font-size:14px; color:var(--dark);
+            margin-bottom:7px;
+        }
+        .hc-route-line i { color:var(--primary); }
+        .hc-route-line .arrow { color:#cbd5e1; font-size:10px; }
+        .hc-route-details { display:flex; gap:14px; flex-wrap:wrap; }
+        .hc-route-details span {
+            font-size:12px; display:flex; align-items:center; gap:4px;
+        }
+        .hc-date { color:#166534; font-weight:600; }
+        .hc-time { color:var(--primary); font-weight:600; }
+
+        /* Actions */
+        .hc-actions { display:flex; gap:9px; }
+        .btn-reviews {
+            flex:1; padding:11px;
+            background:#fffbeb; color:#92400e;
+            border:1px solid #fcd34d; border-radius:10px;
+            font-size:13px; font-weight:700;
+            text-decoration:none; text-align:center;
+            transition:0.2s; display:flex;
+            align-items:center; justify-content:center; gap:5px;
+        }
+        .btn-reviews:hover { background:#fef3c7; }
+        .btn-book {
+            flex:2; padding:11px;
+            background:linear-gradient(135deg,var(--primary),#2563eb);
+            color:white; border:none; border-radius:10px;
+            font-size:13px; font-weight:700; cursor:pointer;
+            text-decoration:none; display:flex;
+            align-items:center; justify-content:center; gap:6px;
+            transition:0.2s;
+        }
+        .btn-book:hover {
+            transform:translateY(-1px);
+            box-shadow:0 5px 16px rgba(26,86,219,.3);
+        }
+
+        /* ── EMPTY STATE ─────────────────────────────── */
+        .empty-state {
+            grid-column:1/-1; text-align:center;
+            padding:70px 30px; background:white;
+            border-radius:var(--radius); border:2px dashed #e2e8f0;
+        }
+        .empty-icon {
+            width:80px; height:80px; border-radius:50%;
+            background:var(--light);
+            display:flex; align-items:center; justify-content:center;
+            font-size:32px; margin:0 auto 18px; color:var(--mid);
+        }
+        .empty-state h3 {
+            font-size:18px; font-weight:700;
+            color:var(--dark); margin-bottom:8px;
+        }
+        .empty-state p { font-size:14px; color:var(--mid); }
+
+        /* ── RESPONSIVE ──────────────────────────────── */
+        @media(max-width:900px) {
+            .hero h1 { font-size:28px; }
+            .filter-grid { grid-template-columns:repeat(2,1fr); }
+        }
+        @media(max-width:640px) {
+            .navbar-links { display:none; }
+            .hero { padding:40px 20px 50px; }
+            .hero h1 { font-size:24px; }
+            .filter-card { padding:18px; }
+            .filter-grid { grid-template-columns:1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── NAVBAR ────────────────────────────────────────── -->
+<nav class="navbar">
+    <a href="/home" class="navbar-brand">
+        <div class="brand-logo">🚐</div>
+        <div class="brand-text">Hiace<span>Booking</span></div>
+    </a>
+
+    <div class="navbar-links">
+        <a th:href="@{/routes}">
+            <i class="fas fa-route"></i> Routes
+        </a>
+<a th:href="@{/hiaces/list}"><i class="fas fa-shuttle-van"></i> View Hiaces</a>
+        <a th:href="@{/hiaces}" class="nav-hiace active">
+            <i class="fas fa-shuttle-van"></i> View Hiaces &amp; Book
+        </a>
+        <a th:href="@{/booking/my-bookings}">
+            <i class="fas fa-ticket-alt"></i> My Bookings
+        </a>
+        <a th:href="@{/home}">
+            <i class="fas fa-home"></i> Home
+        </a>
+    </div>
+
+    <div class="navbar-right">
+        <div class="user-pill">
+            <div class="avatar"
+                 th:text="${#strings.substring(
+                 #authentication.name,0,1).toUpperCase()}">
+            </div>
+            <span th:text="${#authentication.name}"></span>
+        </div>
+        <a th:href="@{/users/logout}" class="btn-logout">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+    </div>
+</nav>
+
+<!-- ── HERO ──────────────────────────────────────────── -->
+<section class="hero">
+    <div class="hero-content">
+        <div class="hero-badge">
+            <span class="live-dot"></span>
+            Live Availability
+        </div>
+        <h1>Browse <span>Available Hiaces</span></h1>
+        <p>Filter by category, route and date —
+           then pick your seat and book securely with eSewa</p>
+    </div>
+</section>
+
+<!-- ── FILTER CARD ───────────────────────────────────── -->
+<div class="filter-wrap">
+    <div class="filter-card">
+        <div class="filter-card-top">
+            <i class="fas fa-sliders-h"></i>
+            <h3>Filter &amp; Sort</h3>
+        </div>
+
+        <form th:action="@{/hiaces}" method="GET">
+            <div class="filter-grid">
+
+                <div class="fg-group">
+                    <label>Category</label>
+                    <select name="category">
+                        <option value="">All Categories</option>
+                        <option th:each="cat : ${categories}"
+                                th:value="${cat}"
+                                th:text="${cat}"
+                                th:selected="${cat.name() ==
+                                selectedCategory}">
+                        </option>
+                    </select>
+                </div>
+
+                <div class="fg-group">
+                    <label>From</label>
+                    <select name="source">
+                        <option value="">All Sources</option>
+                        <option th:each="s : ${allSources}"
+                                th:value="${s}"
+                                th:text="${s}"
+                                th:selected="${s == selectedSource}">
+                        </option>
+                    </select>
+                </div>
+
+                <div class="fg-group">
+                    <label>To</label>
+                    <select name="destination">
+                        <option value="">All Destinations</option>
+                        <option th:each="d : ${allDestinations}"
+                                th:value="${d}"
+                                th:text="${d}"
+                                th:selected="${d == selectedDest}">
+                        </option>
+                    </select>
+                </div>
+
+                <div class="fg-group">
+                    <label>Sort by Date</label>
+                    <select name="sortDate">
+                        <option value="">Default</option>
+                        <option value="nearest"
+                                th:selected="${'nearest' ==
+                                selectedSortDate}">
+                            📅 Nearest First
+                        </option>
+                        <option value="farthest"
+                                th:selected="${'farthest' ==
+                                selectedSortDate}">
+                            📅 Farthest First
+                        </option>
+                    </select>
+                </div>
+
+                <div class="fg-group">
+                    <label>&nbsp;</label>
+                    <button type="submit" class="btn-search">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </div>
+
+                <div class="fg-group">
+                    <label>&nbsp;</label>
+                    <a th:href="@{/hiaces}" class="btn-clear">
+                        <i class="fas fa-times"></i> Clear
+                    </a>
+                </div>
+
+            </div>
+
+            <!-- Active filter chips -->
+            <div class="active-chips"
+                 th:if="${selectedCategory != null or
+                          selectedSource != null or
+                          selectedDest != null or
+                          selectedSortDate != null}">
+                <span class="chip"
+                      th:if="${selectedCategory != null
+                      and selectedCategory != ''}">
+                    🏷️ <span th:text="${selectedCategory}"></span>
+                </span>
+                <span class="chip"
+                      th:if="${selectedSource != null
+                      and selectedSource != ''}">
+                    📍 From: <span th:text="${selectedSource}"></span>
+                </span>
+                <span class="chip"
+                      th:if="${selectedDest != null
+                      and selectedDest != ''}">
+                    🎯 To: <span th:text="${selectedDest}"></span>
+                </span>
+                <span class="chip"
+                      th:if="${selectedSortDate != null
+                      and selectedSortDate != ''}">
+                    📅 <span th:text="${selectedSortDate == 'nearest'}
+                              ? 'Nearest First' : 'Farthest First'">
+                        </span>
+                </span>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ── MOST POPULAR ROUTE BANNER ─────────────────── -->
+<div th:if="${popularSource != null}"
+     style="max-width:1100px;margin:22px auto 0;padding:0 20px;">
+
+    <div style="
+        background:linear-gradient(135deg,#0f172a,#1e3a5f,#1e40af);
+        border-radius:18px; padding:22px 28px;
+        display:flex; align-items:center; gap:20px; flex-wrap:wrap;
+        box-shadow:0 8px 32px rgba(30,64,175,.35);
+        border:1px solid rgba(56,189,248,.2);
+        position:relative; overflow:hidden;
+    ">
+        <!-- Glow -->
+        <div style="position:absolute;top:-40px;right:-40px;
+            width:200px;height:200px;border-radius:50%;
+            background:radial-gradient(circle,
+                rgba(56,189,248,.15) 0%,transparent 70%);"></div>
+
+        <!-- Fire icon -->
+        <div style="background:linear-gradient(135deg,#f59e0b,#d97706);
+            border-radius:14px;padding:14px 18px;
+            display:flex;align-items:center;justify-content:center;
+            font-size:28px;flex-shrink:0;
+            box-shadow:0 6px 20px rgba(245,158,11,.45);">🔥</div>
+
+        <!-- Info -->
+        <div style="flex:1;min-width:0;">
+
+            <div style="font-size:11px;font-weight:800;color:#38bdf8;
+                text-transform:uppercase;letter-spacing:1.2px;
+                margin-bottom:6px;display:flex;align-items:center;gap:6px;">
+                <i class="fas fa-crown"></i>
+                Most Popular Route — Highest Demand
+            </div>
+
+            <!-- Source → Destination (always accurate) -->
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                <span style="font-size:22px;font-weight:900;color:#fff;
+                    letter-spacing:-.3px;"
+                      th:text="${popularSource}"></span>
+                <i class="fas fa-arrow-right"
+                   style="color:#38bdf8;font-size:18px;"></i>
+                <span style="font-size:22px;font-weight:900;color:#fff;
+                    letter-spacing:-.3px;"
+                      th:text="${popularDest}"></span>
+            </div>
+
+<!-- Stats pills -->
+<div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;">
+
+    <!-- Only show these when an upcoming trip exists -->
+    <th:block th:if="${popularNextRoute != null}">
+
+        <!-- Hiace + Category -->
+        <span style="font-size:12px;color:rgba(255,255,255,.8);
+            display:flex;align-items:center;gap:5px;
+            background:rgba(16,185,129,.12);padding:5px 13px;
+            border-radius:20px;border:1px solid rgba(16,185,129,.3);">
+            <i class="fas fa-shuttle-van" style="color:#6ee7b7;"></i>
+            <span th:text="${popularNextRoute.hiace.vehicleNumber}
+                  + ' — ' + ${popularNextRoute.hiace.category}">
+            </span>
+        </span>
+
+        <!-- Next departure date -->
+        <span style="font-size:12px;color:rgba(255,255,255,.8);
+            display:flex;align-items:center;gap:5px;
+            background:rgba(245,158,11,.12);padding:5px 13px;
+            border-radius:20px;border:1px solid rgba(245,158,11,.3);">
+            <i class="fas fa-calendar-check" style="color:#fde68a;"></i>
+            Next departure:
+            <strong style="color:#fde68a;"
+                    th:text="${#temporals.format(
+                    popularNextRoute.departureDate,'dd MMM yyyy')}">
+            </strong>
+        </span>
+
+        <!-- Departure time -->
+        <span style="font-size:12px;color:rgba(255,255,255,.8);
+            display:flex;align-items:center;gap:5px;
+            background:rgba(56,189,248,.1);padding:5px 13px;
+            border-radius:20px;border:1px solid rgba(56,189,248,.2);">
+            <i class="fas fa-clock" style="color:#38bdf8;"></i>
+            <span th:text="${popularNextRoute.departureTime}"></span>
+        </span>
+
+        <!-- Confirmed bookings for THIS specific trip only -->
+        <span th:if="${popularTripCount > 0}"
+              style="font-size:12px;color:rgba(255,255,255,.8);
+            display:flex;align-items:center;gap:5px;
+            background:rgba(99,102,241,.12);padding:5px 13px;
+            border-radius:20px;border:1px solid rgba(99,102,241,.3);">
+            <i class="fas fa-users" style="color:#a5b4fc;"></i>
+            <span th:text="${popularTripCount}+' booked for this trip'">
+            </span>
+        </span>
+
+    </th:block>
+
+    <!-- No upcoming trip -->
+    <span th:unless="${popularNextRoute != null}"
+          style="font-size:12px;color:rgba(255,255,255,.6);
+        display:flex;align-items:center;gap:5px;
+        background:rgba(255,255,255,.06);padding:5px 13px;
+        border-radius:20px;border:1px solid rgba(255,255,255,.1);">
+        <i class="fas fa-clock" style="color:#64748b;"></i>
+        No upcoming trips scheduled yet
+    </span>
+
+</div>
+        </div>
+
+        <!-- CTA — only if there is an upcoming trip -->
+        <a th:if="${popularNextRoute != null}"
+           th:href="@{/hiaces(source=${popularSource},
+                              destination=${popularDest})}"
+           style="padding:13px 24px;
+            background:linear-gradient(135deg,#f59e0b,#d97706);
+            color:#0f172a;border-radius:12px;text-decoration:none;
+            font-size:14px;font-weight:800;
+            display:flex;align-items:center;gap:8px;
+            white-space:nowrap;flex-shrink:0;
+            box-shadow:0 6px 20px rgba(245,158,11,.45);transition:.25s;"
+           onmouseover="this.style.transform='translateY(-2px)';
+                        this.style.boxShadow='0 10px 28px rgba(245,158,11,.55)'"
+           onmouseout="this.style.transform='';
+                       this.style.boxShadow='0 6px 20px rgba(245,158,11,.45)'">
+            <i class="fas fa-fire"></i> Book This Route
+        </a>
+
+        <!-- No CTA when no upcoming trip -->
+        <div th:unless="${popularNextRoute != null}"
+             style="padding:13px 22px;
+             background:rgba(255,255,255,.06);
+             color:rgba(255,255,255,.4);border-radius:12px;
+             font-size:13px;font-weight:700;
+             border:1px solid rgba(255,255,255,.1);
+             white-space:nowrap;flex-shrink:0;
+             display:flex;align-items:center;gap:7px;">
+            <i class="fas fa-calendar-times"></i>
+            Check Back Soon
+        </div>
+
+    </div>
+</div>
+
+<!-- ── RESULTS HEADER ─────────────────────────────────── -->
+<div class="results-header">
+    <h2>
+        <i class="fas fa-shuttle-van"
+           style="color:var(--primary);font-size:18px;"></i>
+        Available Hiaces
+    </h2>
+    <span class="results-count"
+          th:text="${routes.size()} + ' found'">
+    </span>
+</div>
+
+<!-- ── HIACE CARDS ────────────────────────────────────── -->
+<div class="hiaces-grid">
+
+    <!-- Empty state -->
+    <div th:if="${#lists.isEmpty(routes)}" class="empty-state">
+        <div class="empty-icon">
+            <i class="fas fa-shuttle-van"></i>
+        </div>
+        <h3>No Hiaces Found</h3>
+        <p>Try adjusting your filters or clearing them to see
+           all available Hiaces.</p>
+    </div>
+
+    <!-- Hiace cards -->
+    <div class="hiace-card"
+         th:each="route : ${routes}">
+
+        <!-- Image + badges -->
+        <div class="hc-img-wrap">
+            <img th:if="${route.hiace.imageName != null}"
+                 th:src="@{'/uploads/'+${route.hiace.imageName}}"
+                 th:alt="${route.hiace.vehicleNumber}"
+                 class="hc-img">
+            <div th:unless="${route.hiace.imageName != null}"
+                 class="hc-img-placeholder">
+                <i class="fas fa-bus"></i>
+                <span th:text="${route.hiace.vehicleNumber}"></span>
+            </div>
+
+            <!-- Category badge -->
+            <span class="hc-cat-badge"
+                  th:classappend="${route.hiace.category}"
+                  th:text="${route.hiace.category}">
+            </span>
+
+            <!-- Rating badge -->
+            <div class="hc-rating-badge"
+                 th:if="${ratingMap != null and
+                          ratingMap[route.hiace.hiaceId] != null
+                          and ratingMap[route.hiace.hiaceId] > 0}">
+                <i class="fas fa-star"></i>
+                <span th:text="${ratingMap[route.hiace.hiaceId]}">
+                </span>
+                <span style="color:rgba(255,255,255,.6);"
+                      th:text="'('+${countMap[route.hiace.hiaceId]}+')'">
+                </span>
+            </div>
+            <div class="hc-rating-badge"
+                 th:unless="${ratingMap != null and
+                              ratingMap[route.hiace.hiaceId] != null
+                              and ratingMap[route.hiace.hiaceId] > 0}">
+                <i class="far fa-star"></i>
+                <span>New</span>
+            </div>
+        </div>
+
+        <!-- Body -->
+        <div class="hc-body">
+            <div class="hc-top">
+                <div class="hc-vehicle"
+                     th:text="${route.hiace.vehicleNumber}">
+                </div>
+                <div class="hc-fare">
+                    Rs. <span th:text="${route.fare}"></span>
+                    <small>/ seat</small>
+                </div>
+            </div>
+
+            <div class="hc-meta">
+                <span>
+                    <i class="fas fa-chair"
+                       style="color:#94a3b8;"></i>
+                    <span th:text="${route.hiace.totalSeats}
+                          + ' seats'">
+                    </span>
+                </span>
+                <span>
+                    <i class="fas fa-user"
+                       style="color:#94a3b8;"></i>
+                    <span th:text="${route.hiace.driverName}">
+                    </span>
+                </span>
+            </div>
+
+            <div class="hc-route">
+                <div class="hc-route-line">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span th:text="${route.source}"></span>
+                    <i class="fas fa-arrow-right arrow"></i>
+                    <span th:text="${route.destination}"></span>
+                </div>
+                <div class="hc-route-details">
+                    <span class="hc-date">
+                        📅
+                        <span th:text="${route.departureDate != null}
+                              ? ${#temporals.format(
+                              route.departureDate,'dd MMM yyyy')}
+                              : 'TBD'">
+                        </span>
+                    </span>
+                    <span class="hc-time">
+                        🕐
+                        <span th:text="${route.departureTime}">
+                        </span>
+                    </span>
+                </div>
+            </div>
+
+            <div class="hc-actions">
+                <a th:href="@{/review/hiace/{id}
+                              (id=${route.hiace.hiaceId})}"
+                   class="btn-reviews">
+                    ⭐ Reviews
+                </a>
+                <a th:href="@{/booking/select-seat/{id}
+                              (id=${route.routeId})}"
+                   class="btn-book">
+                    <i class="fas fa-ticket-alt"></i>
+                    Select Seat &amp; Book
+                </a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

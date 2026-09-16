@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Hiaces - Admin</title>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root{
+            --p:#2563eb;--pd:#1d4ed8;--pl:#eff6ff;
+            --g:#10b981;--r:#ef4444;
+            --d:#0f172a;--m:#64748b;--l:#f1f5f9;--w:#fff;
+            --sh:0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.06);
+            --shm:0 8px 32px rgba(0,0,0,.12);
+            --sidebar:240px;
+        }
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Segoe UI',system-ui,sans-serif;
+             background:#f0f4f8;color:#1e293b;
+             display:flex;min-height:100vh}
+
+        /* SIDEBAR */
+        .sidebar{width:var(--sidebar);flex-shrink:0;
+            background:linear-gradient(180deg,#0f172a,#1e293b);
+            min-height:100vh;position:fixed;top:0;left:0;z-index:100;
+            display:flex;flex-direction:column;
+            box-shadow:4px 0 24px rgba(0,0,0,.25)}
+        .sb-brand{padding:22px 20px 18px;
+            border-bottom:1px solid rgba(255,255,255,.07)}
+        .sb-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+        .sb-icon{width:40px;height:40px;border-radius:11px;
+            background:linear-gradient(135deg,#2563eb,#38bdf8);
+            display:flex;align-items:center;justify-content:center;font-size:19px}
+        .sb-title{font-size:16px;font-weight:800;color:#fff}
+        .sb-title span{color:#38bdf8}
+        .sb-admin{padding:12px 16px;margin:12px 14px;
+            background:rgba(255,255,255,.05);border-radius:10px;
+            border:1px solid rgba(255,255,255,.07);
+            display:flex;align-items:center;gap:9px}
+        .sb-av{width:32px;height:32px;border-radius:50%;
+            background:linear-gradient(135deg,#2563eb,#38bdf8);
+            color:#fff;display:flex;align-items:center;
+            justify-content:center;font-size:13px;font-weight:800}
+        .sb-aname{font-size:12px;font-weight:700;color:#e2e8f0}
+        .sb-arole{font-size:10px;color:#475569}
+        .sb-nav{flex:1;padding:6px 10px}
+        .sb-sec{font-size:10px;font-weight:700;color:#475569;
+            text-transform:uppercase;letter-spacing:1.2px;padding:12px 8px 6px}
+        .sb-link{display:flex;align-items:center;gap:10px;
+            padding:10px 12px;border-radius:10px;text-decoration:none;
+            font-size:13px;font-weight:600;color:#94a3b8;
+            transition:.2s;margin-bottom:2px;position:relative}
+        .sb-link:hover{background:rgba(255,255,255,.06);color:#e2e8f0}
+        .sb-link.active{background:linear-gradient(135deg,
+            rgba(37,99,235,.25),rgba(37,99,235,.12));
+            color:#60a5fa;border:1px solid rgba(37,99,235,.25)}
+        .sb-link.active:before{content:'';position:absolute;
+            left:0;top:5px;bottom:5px;width:3px;border-radius:0 3px 3px 0;
+            background:linear-gradient(180deg,#60a5fa,#38bdf8)}
+        .sb-link i{width:16px;text-align:center;font-size:13px}
+        .sb-footer{padding:14px;border-top:1px solid rgba(255,255,255,.06)}
+        .sb-user{font-size:11px;color:#475569;margin-bottom:8px;padding:0 4px}
+        .sb-logout{display:flex;align-items:center;gap:8px;
+            padding:9px 12px;border-radius:9px;text-decoration:none;
+            font-size:13px;font-weight:600;color:#94a3b8;transition:.2s;
+            width:100%;border:none;background:transparent;cursor:pointer}
+        .sb-logout:hover{background:rgba(239,68,68,.12);color:#fca5a5}
+
+        /* MAIN */
+        .main{margin-left:var(--sidebar);flex:1;display:flex;flex-direction:column}
+        .topbar{background:var(--w);height:60px;padding:0 26px;
+            display:flex;align-items:center;justify-content:space-between;
+            box-shadow:0 1px 0 #e2e8f0;position:sticky;top:0;z-index:50}
+        .topbar h1{font-size:18px;font-weight:800;color:var(--d);
+            display:flex;align-items:center;gap:9px}
+        .topbar h1 i{color:var(--p);font-size:16px}
+        .tb-count{background:var(--pl);color:var(--p);
+            padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700}
+        .content{padding:24px 26px;flex:1}
+
+        /* FLASH */
+        .flash-ok{background:#d1fae5;color:#065f46;border:1px solid #6ee7b7;
+            border-radius:10px;padding:11px 16px;margin-bottom:16px;
+            font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
+        .flash-err{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;
+            border-radius:10px;padding:11px 16px;margin-bottom:16px;
+            font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
+
+        /* LAYOUT */
+        .layout{display:grid;grid-template-columns:360px 1fr;gap:22px}
+
+        /* FORM CARD */
+        .form-card{background:var(--w);border-radius:16px;
+            box-shadow:var(--sh);border:1px solid #e8edf5;
+            overflow:hidden;position:sticky;top:72px}
+        .fc-head{padding:15px 20px;border-bottom:1px solid #f1f5f9;
+            display:flex;align-items:center;gap:8px}
+        .fc-head h2{font-size:14px;font-weight:800;color:var(--d)}
+        .fc-head i{color:var(--p)}
+        .fc-body{padding:18px 20px}
+
+        .fg{margin-bottom:14px}
+        .fg label{display:flex;align-items:center;gap:6px;font-size:11px;
+            font-weight:700;color:var(--m);text-transform:uppercase;
+            letter-spacing:.5px;margin-bottom:6px}
+        .fg label i{color:var(--p);font-size:11px}
+        .fg input,.fg select{width:100%;padding:10px 13px;
+            border:2px solid #e5e7eb;border-radius:9px;font-size:13px;
+            outline:none;transition:.2s;background:#fafafa;color:var(--d)}
+        .fg input:focus,.fg select:focus{border-color:var(--p);
+            background:#fff;box-shadow:0 0 0 3px rgba(37,99,235,.08)}
+
+        /* Upload zone */
+        .upload-zone{border:2px dashed #cbd5e1;border-radius:11px;
+            padding:24px 16px;text-align:center;cursor:pointer;
+            transition:.2s;background:#fafafa;position:relative;
+            overflow:hidden}
+        .upload-zone:hover{border-color:var(--p);background:#f0f7ff}
+        .upload-zone input[type=file]{position:absolute;inset:0;
+            opacity:0;cursor:pointer;width:100%;height:100%}
+        .upload-zone i{font-size:26px;color:#94a3b8;display:block;margin-bottom:7px}
+        .upload-zone .uz-main{font-size:13px;color:var(--m)}
+        .upload-zone .uz-main span{color:var(--p);font-weight:700}
+        .upload-zone .uz-hint{font-size:11px;color:#94a3b8;margin-top:3px}
+        #imgPreview{width:100%;max-height:120px;object-fit:cover;
+            border-radius:8px;margin-top:10px;display:none}
+
+        .edit-banner{background:#fef9c3;border:1px solid #fde68a;
+            border-radius:9px;padding:9px 13px;margin-bottom:13px;
+            font-size:12px;font-weight:700;color:#854d0e;
+            display:none;align-items:center;gap:7px}
+        .btn-cancel{margin-left:auto;padding:4px 11px;background:#fff;
+            color:var(--d);border:1px solid #e2e8f0;border-radius:7px;
+            font-size:11px;font-weight:700;cursor:pointer;
+            text-decoration:none;transition:.2s}
+        .btn-cancel:hover{background:var(--l)}
+
+        .btn-add{width:100%;padding:12px;
+            background:linear-gradient(135deg,var(--p),#1e40af);
+            color:#fff;border:none;border-radius:10px;font-size:14px;
+            font-weight:700;cursor:pointer;transition:.25s;
+            display:flex;align-items:center;justify-content:center;
+            gap:8px;margin-top:4px;
+            box-shadow:0 4px 14px rgba(37,99,235,.35)}
+        .btn-add:hover{transform:translateY(-2px);
+            box-shadow:0 8px 22px rgba(37,99,235,.45)}
+
+        /* HIACE LIST */
+        .list-card{background:var(--w);border-radius:16px;
+            box-shadow:var(--sh);border:1px solid #e8edf5;overflow:hidden}
+        .lc-head{padding:14px 20px;
+            background:linear-gradient(135deg,#0f172a,#1e293b);
+            display:flex;align-items:center;justify-content:space-between}
+        .lc-head h2{font-size:14px;font-weight:800;color:#fff;
+            display:flex;align-items:center;gap:8px}
+        .lc-head h2 i{color:#38bdf8}
+        .lc-count{background:rgba(56,189,248,.15);color:#38bdf8;
+            padding:3px 11px;border-radius:20px;font-size:12px;
+            font-weight:700;border:1px solid rgba(56,189,248,.25)}
+
+        .hgrid{display:grid;
+            grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+            gap:14px;padding:16px}
+
+        .hcard{background:#f8fafc;border-radius:12px;
+            border:2px solid #e8edf5;overflow:hidden;transition:.25s}
+        .hcard:hover{border-color:#c7d7f5;
+            box-shadow:0 6px 20px rgba(37,99,235,.12);
+            transform:translateY(-3px)}
+
+        /* image wrapper — always 130px tall */
+        .hc-img-box{width:100%;height:130px;overflow:hidden;
+            background:linear-gradient(135deg,#dbeafe,#eff6ff);
+            display:flex;align-items:center;justify-content:center}
+        .hc-img-box img{width:100%;height:130px;
+            object-fit:cover;display:block}
+        .hc-img-box .ph{font-size:38px;color:#93c5fd}
+
+        .hc-body{padding:11px 13px}
+        .hc-top{display:flex;justify-content:space-between;
+            align-items:center;margin-bottom:5px}
+        .hc-veh{font-size:13px;font-weight:800;color:var(--d)}
+        .hc-cat{font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px}
+        .hc-cat.DELUXE{background:#fef3c7;color:#92400e}
+        .hc-cat.NORMAL{background:#d1fae5;color:#065f46}
+        .hc-meta{margin-bottom:9px}
+        .hc-meta span{font-size:11px;color:var(--m);
+            display:flex;align-items:center;gap:4px;margin-bottom:2px}
+        .hc-meta i{color:#94a3b8;width:11px}
+        .hc-acts{display:flex;gap:6px}
+        .btn-edit{flex:1;padding:6px;background:var(--pl);color:var(--p);
+            border:1px solid #c3d5f8;border-radius:7px;font-size:11px;
+            font-weight:700;cursor:pointer;display:flex;align-items:center;
+            justify-content:center;gap:4px;transition:.2s;border-style:solid}
+        .btn-edit:hover{background:#dbeafe}
+        .btn-del{flex:1;padding:6px;background:#fff5f5;color:var(--r);
+            border:1px solid #fca5a5;border-radius:7px;font-size:11px;
+            font-weight:700;cursor:pointer;display:flex;align-items:center;
+            justify-content:center;gap:4px;transition:.2s;text-decoration:none}
+        .btn-del:hover{background:var(--r);color:#fff}
+
+        .no-hiaces{padding:50px;text-align:center;color:var(--m)}
+        .no-hiaces i{font-size:40px;display:block;margin-bottom:12px;opacity:.3}
+
+        @media(max-width:1000px){.layout{grid-template-columns:1fr}
+            .form-card{position:static}}
+        @media(max-width:640px){.sidebar{transform:translateX(-100%)}
+            .main{margin-left:0}}
+    </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+    <div class="sb-brand">
+        <a href="/admin/dashboard" class="sb-logo">
+            <div class="sb-icon">🚐</div>
+            <div>
+                <div class="sb-title">Hiace<span>Booking</span></div>
+            </div>
+        </a>
+    </div>
+    <div class="sb-admin">
+        <div class="sb-av">A</div>
+        <div>
+            <div class="sb-aname">Administrator</div>
+            <div class="sb-arole">Super Admin</div>
+        </div>
+    </div>
+    <nav class="sb-nav">
+        <div class="sb-sec">Main Menu</div>
+        <a th:href="@{/admin/dashboard}" class="sb-link">
+            <i class="fas fa-chart-line"></i> Dashboard
+        </a>
+        <a th:href="@{/admin/hiaces}" class="sb-link active">
+            <i class="fas fa-shuttle-van"></i> Manage Hiaces
+        </a>
+        <a th:href="@{/admin/routes}" class="sb-link">
+            <i class="fas fa-route"></i> Manage Routes
+        </a>
+        <div class="sb-sec">Bookings</div>
+        <a th:href="@{/admin/bookings}" class="sb-link">
+            <i class="fas fa-ticket-alt"></i> View Bookings
+        </a>
+        <a th:href="@{/admin/upcoming-trips}" class="sb-link">
+            <i class="fas fa-calendar-alt"></i> Upcoming Trips
+        </a>
+        <div class="sb-sec">Users</div>
+        <a th:href="@{/admin/users}" class="sb-link">
+            <i class="fas fa-users"></i> View Users
+        </a>
+    </nav>
+    <div class="sb-footer">
+        <div class="sb-user">Logged in as Admin</div>
+        <a th:href="@{/users/logout}" class="sb-logout">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+    </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+    <header class="topbar">
+        <h1><i class="fas fa-shuttle-van"></i> Manage Hiaces</h1>
+        <span class="tb-count"
+              th:text="${hiaces != null ? hiaces.size() : 0} + ' total'">
+        </span>
+    </header>
+
+    <div class="content">
+
+        <!-- Flash -->
+        <div th:if="${successMessage}" class="flash-ok">
+            <i class="fas fa-check-circle"></i>
+            <span th:text="${successMessage}"></span>
+        </div>
+        <div th:if="${errorMessage}" class="flash-err">
+            <i class="fas fa-exclamation-circle"></i>
+            <span th:text="${errorMessage}"></span>
+        </div>
+
+        <div class="layout">
+
+            <!-- ── FORM ──────────────────────── -->
+            <div class="form-card">
+                <div class="fc-head">
+                    <i class="fas fa-plus-circle"></i>
+                    <h2 id="formTitle">Add New Hiace</h2>
+                </div>
+                <div class="fc-body">
+
+                    <div class="edit-banner" id="editBanner">
+                        <i class="fas fa-edit"></i>
+                        Editing hiace
+                        <a href="/admin/hiaces" class="btn-cancel">
+                            Cancel
+                        </a>
+                    </div>
+
+                    <form th:action="@{/admin/hiaces/save}"
+                          method="POST"
+                          enctype="multipart/form-data">
+
+                        <input type="hidden" name="hiaceId"
+                               id="fId">
+                        <input type="hidden" name="imageName"
+                               id="fImg">
+
+                        <div class="fg">
+                            <label>
+                                <i class="fas fa-id-card"></i>
+                                Vehicle Number
+                            </label>
+                            <input type="text" name="vehicleNumber"
+                                   id="fVeh"
+                                   placeholder="e.g. Ba 2 Kha 1234"
+                                   required>
+                        </div>
+
+                        <div class="fg">
+                            <label>
+                                <i class="fas fa-user-tie"></i>
+                                Driver Name
+                            </label>
+                            <input type="text" name="driverName"
+                                   id="fDrv"
+                                   placeholder="Enter driver name"
+                                   required>
+                        </div>
+
+                        <div class="fg">
+                            <label>
+                                <i class="fas fa-chair"></i>
+                                Total Seats
+                            </label>
+                            <input type="number" name="totalSeats"
+                                   id="fSeats"
+                                   placeholder="e.g. 15"
+                                   min="1" max="50" required>
+                        </div>
+
+                        <div class="fg">
+                            <label>
+                                <i class="fas fa-tag"></i>
+                                Category
+                            </label>
+                            <select name="category" id="fCat" required>
+                                <option value="">
+                                    -- Select Category --
+                                </option>
+                                <option value="NORMAL">NORMAL</option>
+                                <option value="DELUXE">DELUXE</option>
+                            </select>
+                        </div>
+
+                        <div class="fg">
+                            <label>
+                                <i class="fas fa-image"></i>
+                                Hiace Image
+                            </label>
+                            <div class="upload-zone">
+                                <input type="file" name="image"
+                                       id="imgInput"
+                                       accept="image/png,image/jpeg"
+                                       onchange="previewImg(this)">
+                                <i class="fas fa-camera"
+                                   id="camIcon"></i>
+                                <div class="uz-main">
+                                    <span>Click to upload</span>
+                                    or drag &amp; drop
+                                </div>
+                                <div class="uz-hint">
+                                    PNG, JPG up to 5MB
+                                </div>
+                                <img id="imgPreview" alt="preview">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-add">
+                            <i class="fas fa-plus-circle"
+                               id="btnIco"></i>
+                            <span id="btnTxt">Add Hiace</span>
+                        </button>
+
+                    </form>
+                </div>
+            </div>
+
+            <!-- ── HIACE GRID ─────────────────── -->
+            <div>
+                <div class="list-card">
+                    <div class="lc-head">
+                        <h2>
+                            <i class="fas fa-shuttle-van"></i>
+                            All Hiaces
+                        </h2>
+                        <span class="lc-count"
+                              th:text="${hiaces.size()} + ' total'">
+                        </span>
+                    </div>
+
+                    <div th:if="${#lists.isEmpty(hiaces)}"
+                         class="no-hiaces">
+                        <i class="fas fa-shuttle-van"></i>
+                        <p style="font-weight:700">No hiaces yet.</p>
+                        <p style="font-size:13px;margin-top:5px">
+                            Add your first hiace using the form.
+                        </p>
+                    </div>
+
+                    <div class="hgrid"
+                         th:unless="${#lists.isEmpty(hiaces)}">
+
+                        <!--
+                          KEY FIX: th:onclick is blocked in Thymeleaf 3.1+
+                          for string expressions. Use data-* attributes
+                          and read them in plain JS instead.
+                        -->
+                        <div class="hcard"
+                             th:each="h : ${hiaces}"
+                             th:attr="
+                               data-id=${h.hiaceId},
+                               data-veh=${h.vehicleNumber},
+                               data-drv=${h.driverName},
+                               data-seats=${h.totalSeats},
+                               data-cat=${h.category},
+                               data-img=${h.imageName != null ?
+                                          h.imageName : ''}">
+
+                            <!-- Image box — always 130px -->
+                            <div class="hc-img-box">
+                                <img th:if="${h.imageName != null}"
+                                     th:src="@{'/uploads/'+
+                                     ${h.imageName}}"
+                                     th:alt="${h.vehicleNumber}"
+                                     onerror="this.style.display='none';
+                                     this.nextElementSibling
+                                         .style.display='flex'">
+                                <div class="ph"
+                                     th:style="${h.imageName != null}
+                                     ? 'display:none' : 'display:flex'">
+                                    🚐
+                                </div>
+                            </div>
+
+                            <div class="hc-body">
+                                <div class="hc-top">
+                                    <div class="hc-veh"
+                                         th:text="${h.vehicleNumber}">
+                                    </div>
+                                    <span class="hc-cat"
+                                          th:classappend="${h.category}"
+                                          th:text="${h.category}">
+                                    </span>
+                                </div>
+                                <div class="hc-meta">
+                                    <span>
+                                        <i class="fas fa-user-tie"></i>
+                                        <span th:text="${h.driverName}">
+                                        </span>
+                                    </span>
+                                    <span>
+                                        <i class="fas fa-chair"></i>
+                                        <span th:text="${h.totalSeats}
+                                              + ' seats'">
+                                        </span>
+                                    </span>
+                                </div>
+                                <div class="hc-acts">
+                                    <!-- Edit: reads data-* via JS -->
+                                    <button class="btn-edit"
+                                            onclick="editCard(this)">
+                                        <i class="fas fa-edit"></i>
+                                        Edit
+                                    </button>
+                                    <a th:href="@{/admin/hiaces/delete/
+                                       {id}(id=${h.hiaceId})}"
+                                       class="btn-del"
+                                       onclick="return confirm(
+                                       'Delete this hiace and all its routes/bookings?')">
+                                        <i class="fas fa-trash"></i>
+                                        Delete
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+/* Image preview */
+function previewImg(input) {
+    var p = document.getElementById('imgPreview');
+    var c = document.getElementById('camIcon');
+    if (input.files && input.files[0]) {
+        var r = new FileReader();
+        r.onload = function(e) {
+            p.src = e.target.result;
+            p.style.display = 'block';
+            c.style.display = 'none';
+        };
+        r.readAsDataURL(input.files[0]);
+    }
+}
+
+/*
+  Edit button — reads hiace data from the card's data-* attributes.
+  This completely avoids th:onclick string expressions which are
+  blocked by Thymeleaf 3.1 security.
+*/
+function editCard(btn) {
+    var card = btn.closest('.hcard');
+    var id    = card.getAttribute('data-id');
+    var veh   = card.getAttribute('data-veh');
+    var drv   = card.getAttribute('data-drv');
+    var seats = card.getAttribute('data-seats');
+    var cat   = card.getAttribute('data-cat');
+    var img   = card.getAttribute('data-img');
+
+    document.getElementById('fId').value    = id;
+    document.getElementById('fVeh').value   = veh;
+    document.getElementById('fDrv').value   = drv;
+    document.getElementById('fSeats').value = seats;
+    document.getElementById('fCat').value   = cat;
+    document.getElementById('fImg').value   = img;
+
+    document.getElementById('formTitle').textContent = 'Edit Hiace';
+    document.getElementById('btnIco').className      = 'fas fa-save';
+    document.getElementById('btnTxt').textContent    = 'Update Hiace';
+    document.getElementById('editBanner').style.display = 'flex';
+
+    document.querySelector('.form-card')
+            .scrollIntoView({behavior:'smooth', block:'start'});
+}
+</script>
+</body>
+</html>

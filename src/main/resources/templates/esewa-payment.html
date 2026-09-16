@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Pay with eSewa - Hiace Booking</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box;
+            font-family:'Segoe UI', sans-serif; }
+
+        body {
+            background:linear-gradient(135deg,#f0f2f5,#e8f4fd);
+            display:flex; justify-content:center;
+            align-items:center; min-height:100vh; padding:20px;
+        }
+
+        .card {
+            background:white; border-radius:20px;
+            padding:35px; max-width:480px; width:100%;
+            box-shadow:0 10px 40px rgba(0,0,0,0.12);
+        }
+
+        /* Header */
+        .pay-header {
+            text-align:center; margin-bottom:25px;
+        }
+        .esewa-circle {
+            width:72px; height:72px; border-radius:50%;
+            background:#60BB46; display:flex;
+            align-items:center; justify-content:center;
+            font-size:32px; margin:0 auto 12px;
+            box-shadow:0 6px 20px rgba(96,187,70,0.4);
+        }
+        .pay-header h2 {
+            font-size:22px; font-weight:800; color:#1e293b;
+            margin-bottom:4px;
+        }
+        .pay-header p { font-size:13px; color:#64748b; }
+
+        /* Trip info */
+        .trip-info {
+            background:#f8fafc; border-radius:12px;
+            padding:16px; margin-bottom:18px;
+        }
+        .trip-info .trip-route {
+            font-size:16px; font-weight:800; color:#1e293b;
+            display:flex; align-items:center; gap:8px;
+            margin-bottom:10px;
+        }
+        .trip-info .trip-route .arrow { color:#94a3b8; }
+        .trip-meta {
+            display:flex; gap:15px; flex-wrap:wrap;
+        }
+        .trip-meta span {
+            font-size:12px; color:#64748b;
+            display:flex; align-items:center; gap:4px;
+        }
+        .trip-meta strong { color:#1e293b; }
+
+        /* Seats */
+        .seats-section {
+            margin-bottom:18px;
+        }
+        .seats-section .sec-title {
+            font-size:12px; font-weight:700; color:#64748b;
+            text-transform:uppercase; letter-spacing:0.5px;
+            margin-bottom:8px;
+        }
+        .seats-chips {
+            display:flex; flex-wrap:wrap; gap:6px;
+        }
+        .seat-chip {
+            background:#dbeafe; color:#1d4ed8;
+            padding:5px 12px; border-radius:20px;
+            font-size:13px; font-weight:700;
+        }
+
+        /* Divider */
+        .divider {
+            border:none; border-top:2px solid #f1f5f9;
+            margin:18px 0;
+        }
+
+        /* Amount */
+        .amount-section {
+            background:linear-gradient(135deg,#f0fdf4,#dcfce7);
+            border:2px solid #86efac; border-radius:14px;
+            padding:18px; text-align:center; margin-bottom:22px;
+        }
+        .amount-section .a-label {
+            font-size:12px; color:#166534;
+            font-weight:600; margin-bottom:5px;
+        }
+        .amount-section .a-amount {
+            font-size:36px; font-weight:900; color:#15803d;
+        }
+        .amount-section .a-note {
+            font-size:12px; color:#4ade80; margin-top:4px;
+        }
+
+        /* Booking ref */
+        .booking-ref {
+            background:#fffbeb; border:1px solid #fcd34d;
+            border-radius:10px; padding:10px 14px;
+            font-size:12px; color:#92400e;
+            margin-bottom:20px;
+            display:flex; justify-content:space-between;
+        }
+
+        /* Pay button */
+        .btn-esewa {
+            width:100%; padding:16px;
+            background:#60BB46; color:white;
+            border:none; border-radius:12px;
+            font-size:16px; font-weight:800;
+            cursor:pointer; transition:0.2s;
+            display:flex; align-items:center;
+            justify-content:center; gap:10px;
+            margin-bottom:10px;
+            letter-spacing:0.3px;
+        }
+        .btn-esewa:hover {
+            background:#4d9e35; transform:translateY(-2px);
+            box-shadow:0 8px 25px rgba(96,187,70,0.4);
+        }
+        .btn-esewa:active { transform:translateY(0); }
+
+        .btn-back {
+            width:100%; padding:12px;
+            background:#f1f5f9; color:#64748b;
+            border:none; border-radius:12px; font-size:14px;
+            cursor:pointer; transition:0.2s;
+            text-decoration:none; display:block;
+            text-align:center; font-weight:600;
+        }
+        .btn-back:hover { background:#e2e8f0; color:#374151; }
+
+        /* Secure note */
+        .secure-note {
+            text-align:center; margin-top:14px;
+            font-size:11px; color:#94a3b8;
+            display:flex; align-items:center;
+            justify-content:center; gap:5px;
+        }
+
+        /* Steps */
+        .steps {
+            display:flex; justify-content:center;
+            gap:5px; margin-bottom:22px;
+        }
+        .step {
+            display:flex; align-items:center;
+            gap:5px; font-size:12px; color:#94a3b8;
+        }
+        .step.active { color:#60BB46; font-weight:700; }
+        .step-dot {
+            width:8px; height:8px; border-radius:50%;
+            background:#e2e8f0;
+        }
+        .step.active .step-dot { background:#60BB46; }
+        .step-line {
+            width:30px; height:2px; background:#e2e8f0;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+
+    <!-- Header -->
+    <div class="pay-header">
+        <div class="esewa-circle">💚</div>
+        <h2>Complete Your Payment</h2>
+        <p>You will be redirected to eSewa to complete payment</p>
+    </div>
+
+    <!-- Progress steps -->
+    <div class="steps">
+        <div class="step">
+            <div class="step-dot"></div> Select Seats
+        </div>
+        <div class="step-line"></div>
+        <div class="step active">
+            <div class="step-dot"></div> Payment
+        </div>
+        <div class="step-line"></div>
+        <div class="step">
+            <div class="step-dot"></div> Confirmed
+        </div>
+    </div>
+
+    <!-- Trip info -->
+    <div class="trip-info">
+        <div class="trip-route">
+            <span th:text="${route.source}"></span>
+            <span class="arrow">→</span>
+            <span th:text="${route.destination}"></span>
+        </div>
+        <div class="trip-meta">
+            <span>
+                📅
+                <strong th:text="${route.departureDate != null} ?
+                    ${#temporals.format(route.departureDate,
+                     'dd MMM yyyy')} : 'N/A'">
+                </strong>
+            </span>
+            <span>
+                🕐
+                <strong th:text="${route.departureTime}"></strong>
+            </span>
+            <span>
+                🚐
+                <strong th:text="${route.hiace.vehicleNumber}">
+                </strong>
+            </span>
+        </div>
+    </div>
+
+    <!-- Seats booked -->
+    <div class="seats-section">
+        <div class="sec-title">
+            Seats Booked
+            (<span th:text="${seatCount}"></span>)
+        </div>
+        <div class="seats-chips">
+            <span class="seat-chip"
+                  th:each="s : ${seatNumbers}"
+                  th:text="'Seat ' + ${s}">
+            </span>
+        </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- Total amount -->
+    <div class="amount-section">
+        <div class="a-label">Total Amount to Pay</div>
+        <div class="a-amount">
+            Rs. <span th:text="${amount}"></span>
+        </div>
+        <div class="a-note"
+             th:text="${seatCount} + ' seat(s) × Rs. ' + ${route.fare}">
+        </div>
+    </div>
+
+    <!-- Booking ref -->
+    <div class="booking-ref">
+        <span>📋 Booking Reference</span>
+        <strong th:text="'#' + ${bookingId}"></strong>
+    </div>
+
+   <!-- eSewa payment form -->
+<form id="esewaForm"
+      method="POST"
+      action="https://rc-web.esewa.com.np/api/epay/main/v2/form">
+
+    <input type="hidden" name="amount"
+           th:value="${amount}">
+    <input type="hidden" name="tax_amount"
+           value="0">
+    <input type="hidden" name="total_amount"
+           th:value="${amount}">
+    <input type="hidden" name="transaction_uuid"
+           th:value="${bookingId}">
+    <input type="hidden" name="product_code"
+           th:value="${merchantCode}">
+    <input type="hidden"
+           name="product_service_charge" value="0">
+    <input type="hidden"
+           name="product_delivery_charge" value="0">
+    <input type="hidden" name="success_url"
+           th:value="${successUrl}">
+    <input type="hidden" name="failure_url"
+           th:value="${failureUrl}">
+    <input type="hidden" name="signed_field_names"
+           value="total_amount,transaction_uuid,product_code">
+
+    <!-- Dynamic HMAC-SHA256 signature ← KEY FIX -->
+    <input type="hidden" name="signature"
+           th:value="${signature}">
+
+    <button type="submit" class="btn-esewa">
+        💚 Pay Rs.
+        <span th:text="${amount}"></span>
+        with eSewa
+    </button>
+</form>
+
+    <a th:href="@{/home}" class="btn-back">
+        ← Cancel &amp; Go Back
+    </a>
+
+    <div class="secure-note">
+        🔒 256-bit SSL Encrypted · Powered by eSewa
+    </div>
+
+</div>
+</body>
+</html>

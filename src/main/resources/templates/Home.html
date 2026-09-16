@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hiace Booking System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --p:#2563eb; --pd:#1d4ed8; --pl:#eff6ff;
+            --a:#f59e0b; --ad:#d97706;
+            --g:#10b981; --r:#ef4444;
+            --d:#0f172a; --d2:#1e293b; --d3:#334155;
+            --m:#64748b; --l:#f1f5f9; --w:#fff;
+            --sh:0 4px 24px rgba(0,0,0,.08);
+            --shm:0 12px 40px rgba(0,0,0,.14);
+        }
+        *{margin:0;padding:0;box-sizing:border-box}
+        html{scroll-behavior:smooth}
+        body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f4f8;color:#1e293b}
+
+        /* TOPBAR */
+        .tb{background:var(--d);padding:7px 32px;display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#94a3b8}
+        .tb span{display:flex;align-items:center;gap:6px}
+
+        /* NAVBAR */
+        .nb{background:var(--w);padding:0 32px;height:66px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 1px 0 #e2e8f0,0 4px 16px rgba(0,0,0,.06);position:sticky;top:0;z-index:999}
+        .nb-brand{display:flex;align-items:center;gap:12px;text-decoration:none}
+        .nb-logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#2563eb,#38bdf8);display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 4px 14px rgba(37,99,235,.35)}
+        .nb-name{font-size:19px;font-weight:800;color:var(--d)}.nb-name b{color:var(--p)}
+        .nb-links{display:flex;align-items:center;gap:2px}
+        .nb-links a{padding:8px 15px;border-radius:9px;text-decoration:none;font-size:13.5px;font-weight:500;color:var(--m);transition:.2s}
+        .nb-links a:hover{background:var(--l);color:var(--d)}
+        .nb-cta{background:linear-gradient(135deg,var(--p),#1e40af)!important;color:#fff!important;font-weight:700!important;padding:9px 20px!important;box-shadow:0 4px 14px rgba(37,99,235,.3)}
+        .nb-cta:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(37,99,235,.4)!important}
+        .nb-r{display:flex;align-items:center;gap:10px}
+        .upill{display:flex;align-items:center;gap:8px;background:var(--l);padding:6px 14px;border-radius:30px;font-size:13px;font-weight:600;color:var(--d)}
+        .uav{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--p),#38bdf8);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800}
+        .lo-btn{padding:8px 16px;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;display:flex;align-items:center;gap:6px;transition:.2s}
+        .lo-btn:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(239,68,68,.4)}
+
+        /* HERO */
+        .hero{background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 45%,#1e40af 100%);padding:90px 20px 100px;text-align:center;position:relative;overflow:hidden}
+        .hero:before{content:'';position:absolute;top:-150px;right:-150px;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(56,189,248,.12) 0%,transparent 70%)}
+        .hero:after{content:'';position:absolute;bottom:-120px;left:-100px;width:450px;height:450px;border-radius:50%;background:radial-gradient(circle,rgba(245,158,11,.08) 0%,transparent 70%)}
+        .h-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);padding:7px 18px;border-radius:30px;font-size:12.5px;color:rgba(255,255,255,.85);margin-bottom:24px;backdrop-filter:blur(6px)}
+        .h-dot{width:7px;height:7px;border-radius:50%;background:#10b981;animation:bp 2s infinite}
+        @keyframes bp{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.4)}}
+        .hero h1{font-size:56px;font-weight:900;color:#fff;line-height:1.05;margin-bottom:18px;letter-spacing:-1px}
+        .hero h1 em{font-style:normal;background:linear-gradient(90deg,#38bdf8,#818cf8,#38bdf8);background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shine 3s linear infinite}
+        @keyframes shine{0%{background-position:0%}100%{background-position:200%}}
+        .hero p{font-size:17px;color:rgba(255,255,255,.72);max-width:540px;margin:0 auto 40px;line-height:1.7}
+        .h-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+        .h-btn1{padding:16px 38px;background:linear-gradient(135deg,var(--a),var(--ad));color:var(--d);border:none;border-radius:14px;font-size:16px;font-weight:800;text-decoration:none;transition:.3s;display:inline-flex;align-items:center;gap:9px;box-shadow:0 8px 24px rgba(245,158,11,.45)}
+        .h-btn1:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(245,158,11,.55)}
+        .h-btn2{padding:16px 38px;background:rgba(255,255,255,.08);color:#fff;border:1.5px solid rgba(255,255,255,.28);border-radius:14px;font-size:16px;font-weight:700;text-decoration:none;transition:.3s;display:inline-flex;align-items:center;gap:9px;backdrop-filter:blur(10px)}
+        .h-btn2:hover{background:rgba(255,255,255,.16);transform:translateY(-3px)}
+        .h-stats{display:flex;justify-content:center;gap:0;margin-top:50px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:20px;max-width:680px;margin-left:auto;margin-right:auto;overflow:hidden;backdrop-filter:blur(8px)}
+        .h-stat{flex:1;padding:22px 10px;text-align:center;border-right:1px solid rgba(255,255,255,.1)}
+        .h-stat:last-child{border-right:none}
+        .h-stat .n{font-size:30px;font-weight:900;color:#fff;line-height:1}
+        .h-stat .lb{font-size:11.5px;color:rgba(255,255,255,.55);margin-top:5px;text-transform:uppercase;letter-spacing:.5px}
+
+        /* FLEET GALLERY */
+        .fleet-sec{background:var(--d2);padding:65px 20px 55px}
+        .fleet-hd{text-align:center;margin-bottom:28px}
+        .fleet-hd .ftag{display:inline-flex;align-items:center;gap:6px;background:rgba(56,189,248,.1);color:#38bdf8;padding:5px 15px;border-radius:20px;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:13px}
+        .fleet-hd h2{font-size:32px;font-weight:800;color:#fff;margin-bottom:8px}
+        .fleet-hd p{font-size:14px;color:#64748b}
+        .fleet-wrap{max-width:1100px;margin:0 auto;position:relative}
+
+        .slide-counter{text-align:center;margin-bottom:14px}
+        .slide-counter span{background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.25);color:#38bdf8;padding:5px 18px;border-radius:30px;font-size:12px;font-weight:700;letter-spacing:1px}
+
+        /* Slider – slides come from RIGHT and exit LEFT */
+        .fleet-track{
+            position:relative;height:480px;border-radius:24px;overflow:hidden;
+            box-shadow:0 30px 80px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.06);
+            margin-bottom:0
+        }
+        .fslide{
+            position:absolute;inset:0;
+            background-size:cover;background-position:center;
+            transform:translateX(100%);
+            transition:transform .75s cubic-bezier(.25,.46,.45,.94);
+            pointer-events:none;will-change:transform
+        }
+        .fslide.active{transform:translateX(0);pointer-events:auto}
+        .fslide.go-left{transform:translateX(-100%);transition:transform .75s cubic-bezier(.55,0,.1,1)}
+        .fslide.from-right{transform:translateX(100%)}
+        
+        .fslide:before{
+            content:'';position:absolute;inset:0;z-index:1;
+            background:linear-gradient(170deg,
+                rgba(0,0,0,0) 0%,
+                rgba(0,0,0,0) 28%,
+                rgba(0,0,0,.45) 62%,
+                rgba(0,0,0,.92) 100%)
+        }
+
+        .finfo{
+            position:absolute;
+            bottom:0;left:0;right:0;
+            padding:30px 35px 28px;
+            z-index:3;
+            display:flex;
+            justify-content:space-between;
+            align-items:flex-end;
+            gap:20px;
+        }
+        .fi-left{
+            display:flex;
+            flex-direction:column;
+            gap:8px;
+        }
+        .fcat{
+            display:inline-flex;
+            align-items:center;
+            padding:4px 14px;
+            border-radius:20px;
+            font-size:10.5px;
+            font-weight:800;
+            letter-spacing:.8px;
+            width:fit-content;
+            backdrop-filter:blur(6px);
+        }
+        .fcat.DELUXE{
+            background:rgba(253,230,138,.15);
+            color:#fde68a;
+            border:1px solid rgba(253,230,138,.3);
+        }
+        .fcat.NORMAL{
+            background:rgba(110,231,183,.15);
+            color:#6ee7b7;
+            border:1px solid rgba(110,231,183,.3);
+        }
+        .fveh{
+            font-size:26px;
+            font-weight:900;
+            color:#fff;
+            text-shadow:0 4px 20px rgba(0,0,0,.8);
+            line-height:1.1;
+            letter-spacing:-.5px;
+        }
+        .fmeta{
+            display:flex;
+            gap:12px;
+            flex-wrap:wrap;
+            margin-top:4px;
+        }
+        .fmeta span{
+            font-size:12.5px;
+            color:rgba(255,255,255,.85);
+            display:flex;
+            align-items:center;
+            gap:6px;
+            background:rgba(0,0,0,.35);
+            padding:4px 12px;
+            border-radius:20px;
+            backdrop-filter:blur(6px);
+            border:1px solid rgba(255,255,255,.08);
+        }
+        .fmeta i{color:#38bdf8}
+
+        .farr{
+            position:absolute;top:44%;transform:translateY(-50%);
+            width:46px;height:46px;border-radius:50%;
+            background:rgba(15,23,42,.6);
+            border:1.5px solid rgba(255,255,255,.15);
+            color:#fff;font-size:15px;cursor:pointer;
+            display:flex;align-items:center;justify-content:center;
+            z-index:10;transition:.25s;backdrop-filter:blur(10px)
+        }
+        .farr:hover{
+            background:rgba(37,99,235,.7);
+            border-color:rgba(56,189,248,.5);
+            transform:translateY(-50%) scale(1.1);
+            box-shadow:0 0 20px rgba(56,189,248,.3)
+        }
+        .farr.prev{left:18px}.farr.next{right:18px}
+
+        /* ═══ ROAD – Hiace moves from RIGHT (dot) to LEFT (flag) ═══ */
+        .road-wrap{
+            position:relative;
+            margin:20px 0 22px;
+            padding:0 8px;
+        }
+        .road-surface{
+            position:relative;
+            height:48px;
+            background:linear-gradient(180deg,#1e2a3a 0%,#151f2e 60%,#0f1621 100%);
+            border-radius:12px;
+            overflow:hidden;
+            box-shadow:inset 0 4px 12px rgba(0,0,0,.5),
+                        0 2px 8px rgba(0,0,0,.4);
+        }
+        .road-surface:before{
+            content:'';position:absolute;top:6px;left:0;right:0;height:2px;
+            background:rgba(255,255,255,.12);
+        }
+        .road-surface:after{
+            content:'';position:absolute;bottom:6px;left:0;right:0;height:2px;
+            background:rgba(255,255,255,.12);
+        }
+        .road-dashes{
+            position:absolute;
+            top:50%;transform:translateY(-50%);
+            left:0;width:200%;height:3px;
+            background:repeating-linear-gradient(
+                90deg,
+                transparent 0px, transparent 22px,
+                #f59e0b 22px, #f59e0b 44px
+            );
+            animation:dashMove 0.4s linear infinite;
+        }
+        @keyframes dashMove{from{left:0}to{left:-88px}}
+
+        /* Hiace starts at right (dot) and moves left (flag) */
+        .road-hiace{
+            position:absolute;
+            top:50%;
+            right:0%;                    /* starts at right edge (dot) */
+            transform:translate(50%,-60%);
+            font-size:28px;
+            z-index:5;
+            filter:drop-shadow(0 0 8px rgba(56,189,248,.9))
+                   drop-shadow(0 0 20px rgba(56,189,248,.5));
+            animation:hiaceFloat .5s ease-in-out infinite alternate;
+            transition:right linear;
+            user-select:none;
+        }
+        @keyframes hiaceFloat{
+            from{transform:translate(50%,-65%)}
+            to  {transform:translate(50%,-55%)}
+        }
+
+        .road-flag{
+            position:absolute;left:10px;top:50%;
+            transform:translateY(-50%);
+            font-size:20px;z-index:4;
+            opacity:.7;
+        }
+        .road-start{
+            position:absolute;right:8px;top:50%;
+            transform:translateY(-50%);
+            width:10px;height:10px;border-radius:50%;
+            background:#38bdf8;
+            box-shadow:0 0 8px rgba(56,189,248,.8);
+            z-index:4;
+        }
+        .road-label{
+            text-align:center;margin-top:8px;
+            font-size:11.5px;color:#475569;
+            font-weight:600;letter-spacing:.5px;
+        }
+
+        .fdots{display:flex;justify-content:center;gap:8px;margin-bottom:16px}
+        .fdot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.2);border:none;cursor:pointer;transition:.35s;padding:0}
+        .fdot.on{background:#38bdf8;width:28px;border-radius:4px}
+
+        .fthumbs{display:flex;gap:10px;justify-content:center;overflow-x:auto;padding-bottom:4px}
+        .fthumb{flex-shrink:0;width:120px;cursor:pointer;border-radius:13px;overflow:hidden;border:2px solid rgba(255,255,255,.08);transition:.25s;position:relative}
+        .fthumb.on{border-color:#38bdf8;box-shadow:0 0 0 3px rgba(56,189,248,.25)}
+        .fthumb:hover{border-color:rgba(255,255,255,.3);transform:translateY(-3px)}
+        .fthumb img{width:100%;height:70px;object-fit:cover;display:block}
+        .fph{width:100%;height:70px;background:linear-gradient(135deg,#1e3a5f,#1a56db);display:flex;align-items:center;justify-content:center;font-size:24px;color:rgba(255,255,255,.25)}
+        .ftlb{background:rgba(0,0,0,.7);color:rgba(255,255,255,.9);font-size:10px;font-weight:700;padding:4px 8px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+        .view-all-wrap{text-align:center;margin-top:24px}
+        .btn-view-all{
+            display:inline-flex;align-items:center;gap:9px;
+            padding:13px 32px;
+            background:transparent;
+            color:#38bdf8;
+            border:2px solid rgba(56,189,248,.4);
+            border-radius:14px;
+            font-size:15px;font-weight:700;
+            text-decoration:none;transition:.3s;
+            backdrop-filter:blur(6px);
+        }
+        .btn-view-all:hover{
+            background:rgba(56,189,248,.1);
+            border-color:#38bdf8;
+            transform:translateY(-2px);
+            box-shadow:0 8px 24px rgba(56,189,248,.2);
+        }
+
+        .fempty{text-align:center;padding:55px;color:#475569}
+        .fempty i{font-size:50px;display:block;margin-bottom:14px}
+
+        /* STEPS, CATEGORIES, FEATURES, CTA, CONTACT, FOOTER – same as before */
+        .sec{padding:70px 20px}.sec-alt{background:var(--l)}
+        .inn{max-width:1200px;margin:0 auto}
+        .sh{text-align:center;margin-bottom:52px}
+        .stag{display:inline-flex;align-items:center;gap:6px;background:var(--pl);color:var(--p);padding:5px 15px;border-radius:20px;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:15px}
+        .sh h2{font-size:36px;font-weight:800;color:var(--d);margin-bottom:13px}
+        .sh p{font-size:15px;color:var(--m);max-width:520px;margin:0 auto;line-height:1.65}
+        .uline{width:64px;height:4px;background:linear-gradient(90deg,var(--p),#38bdf8);border-radius:2px;margin:18px auto 0}
+        .sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:28px}
+        .sc{text-align:center;padding:36px 22px;background:#fff;border-radius:20px;box-shadow:var(--sh);position:relative;transition:.3s}
+        .sc:hover{transform:translateY(-7px);box-shadow:var(--shm)}
+        .sn{position:absolute;top:-17px;left:50%;transform:translateX(-50%);width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--p),#38bdf8);color:#fff;font-size:14px;font-weight:900;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(37,99,235,.4)}
+        .si{width:72px;height:72px;border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:30px}
+        .sc:nth-child(1) .si{background:#dbeafe}
+        .sc:nth-child(2) .si{background:#d1fae5}
+        .sc:nth-child(3) .si{background:#fef3c7}
+        .sc:nth-child(4) .si{background:#fce7f3}
+        .sc h3{font-size:16px;font-weight:700;color:var(--d);margin-bottom:9px}
+        .sc p{font-size:13px;color:var(--m);line-height:1.65}
+
+        .cg{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:24px;max-width:700px;margin:0 auto;align-items:stretch}
+        .cc{border-radius:20px;overflow:hidden;text-decoration:none;display:flex;flex-direction:column;transition:.3s;box-shadow:var(--sh)}
+        .cc:hover{transform:translateY(-9px);box-shadow:var(--shm)}
+        .cci{padding:38px 30px;text-align:center;flex:1}
+        .cc.dx .cci{background:linear-gradient(135deg,#fef9c3,#fde68a)}
+        .cc.nm .cci{background:linear-gradient(135deg,#dcfce7,#bbf7d0)}
+        .cic{font-size:54px;margin-bottom:16px;display:block}
+        .cnm{font-size:23px;font-weight:800;margin-bottom:10px}
+        .cc.dx .cnm{color:#78350f}.cc.nm .cnm{color:#14532d}
+        .cds{font-size:14px;line-height:1.65}
+        .cc.dx .cds{color:#92400e}.cc.nm .cds{color:#166534}
+        .cst{padding:13px;text-align:center;font-size:13.5px;font-weight:700;color:#fff}
+        .cc.dx .cst{background:linear-gradient(135deg,#d97706,#b45309)}
+        .cc.nm .cst{background:linear-gradient(135deg,#059669,#047857)}
+
+        .fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:22px}
+        .fc{background:#fff;border-radius:16px;padding:30px 24px;text-align:center;transition:.3s;border:2px solid transparent;box-shadow:var(--sh)}
+        .fc:hover{border-color:var(--p);transform:translateY(-6px);box-shadow:var(--shm)}
+        .fic{width:66px;height:66px;border-radius:20px;background:linear-gradient(135deg,var(--p),#38bdf8);display:flex;align-items:center;justify-content:center;font-size:27px;color:#fff;margin:0 auto 18px;box-shadow:0 6px 20px rgba(37,99,235,.3)}
+        .fc h3{font-size:15px;font-weight:700;color:var(--d);margin-bottom:9px}
+        .fc p{font-size:13px;color:var(--m);line-height:1.65}
+
+        .cta{background:linear-gradient(135deg,#0f172a,#1e3a5f,#1e40af);padding:75px 20px;text-align:center;position:relative;overflow:hidden}
+        .cta:before{content:'';position:absolute;top:-90px;right:-90px;width:350px;height:350px;border-radius:50%;background:rgba(56,189,248,.07)}
+        .cta h2{font-size:38px;font-weight:900;color:#fff;margin-bottom:13px}
+        .cta p{font-size:16px;color:rgba(255,255,255,.68);margin:0 auto 34px;max-width:480px}
+        .cta-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+        .cb1{padding:16px 36px;background:var(--a);color:var(--d);border:none;border-radius:13px;font-size:16px;font-weight:800;text-decoration:none;transition:.3s;display:inline-flex;align-items:center;gap:9px}
+        .cb1:hover{background:var(--ad);color:#fff;transform:translateY(-3px);box-shadow:0 10px 32px rgba(245,158,11,.45)}
+        .cb2{padding:16px 36px;background:transparent;color:#fff;border:2px solid rgba(255,255,255,.3);border-radius:13px;font-size:16px;font-weight:700;text-decoration:none;transition:.3s;display:inline-flex;align-items:center;gap:9px}
+        .cb2:hover{background:rgba(255,255,255,.1);transform:translateY(-3px)}
+
+        .cog{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:20px}
+        .coc{background:#fff;border-radius:16px;padding:30px;text-align:center;box-shadow:var(--sh);transition:.3s;border-top:4px solid}
+        .coc:nth-child(1){border-color:var(--p)}.coc:nth-child(2){border-color:var(--g)}.coc:nth-child(3){border-color:var(--a)}.coc:nth-child(4){border-color:#8b5cf6}
+        .coc:hover{transform:translateY(-5px);box-shadow:var(--shm)}
+        .ci{font-size:38px;margin-bottom:12px;display:block}
+        .coc h4{font-size:15px;font-weight:700;color:var(--d);margin-bottom:7px}
+        .coc p{font-size:13px;color:var(--m);line-height:1.55}
+
+        footer{background:var(--d);padding:55px 20px 22px}
+        .fg2{display:grid;grid-template-columns:2fr repeat(3,1fr);gap:32px;max-width:1100px;margin:0 auto 38px}
+        .fb p{font-size:13px;color:#64748b;margin-top:13px;line-height:1.75;max-width:260px}
+        .fl{display:flex;align-items:center;gap:11px}
+        .fli{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,var(--p),#38bdf8);display:flex;align-items:center;justify-content:center;font-size:19px}
+        .flt{font-size:18px;font-weight:800;color:#fff}.flt b{color:#38bdf8}
+        .fcol h4{font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:15px}
+        .fcol a{display:block;font-size:13px;color:#64748b;text-decoration:none;margin-bottom:9px;transition:.2s}
+        .fcol a:hover{color:#fff}
+        .fcol p{font-size:13px;color:#64748b;margin-bottom:7px}
+        .fbot{border-top:1px solid #1e293b;padding-top:22px;max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+        .fbot p{font-size:12px;color:#475569}
+        .fsoc{display:flex;gap:9px}
+        .fsb{width:35px;height:35px;border-radius:9px;background:#1e293b;color:#64748b;display:flex;align-items:center;justify-content:center;font-size:14px;transition:.2s;text-decoration:none}
+        .fsb:hover{background:var(--p);color:#fff}
+
+        @media(max-width:900px){.hero h1{font-size:38px}.fg2{grid-template-columns:1fr 1fr}.fleet-track{height:320px}}
+        @media(max-width:640px){.tb,.nb-links{display:none}.hero{padding:65px 20px 85px}.hero h1{font-size:28px}.fveh{font-size:20px}.finfo{padding:16px 18px 14px}.fleet-track{height:240px}.fg2{grid-template-columns:1fr}}
+    </style>
+</head>
+<body>
+
+<div class="tb">
+    <span><i class="fas fa-map-marker-alt"></i> Kathmandu, Nepal &nbsp;|&nbsp; <i class="fas fa-phone"></i> +977-9825998116</span>
+    <span><i class="fas fa-envelope"></i> robishniraula5@gmail.com</span>
+</div>
+
+<nav class="nb">
+    <a href="/home" class="nb-brand">
+        <div class="nb-logo">🚐</div>
+        <div class="nb-name">Hiace<b>Booking</b></div>
+    </a>
+    <div class="nb-links">
+        <a th:href="@{/routes}"><i class="fas fa-route"></i> Routes</a>
+        <a th:href="@{/hiaces/list}"><i class="fas fa-shuttle-van"></i> View Hiaces</a>
+        <a th:href="@{/hiaces}" class="nb-cta"><i class="fas fa-shuttle-van"></i> View Hiaces &amp; Book</a>
+        <a th:href="@{/booking/my-bookings}"><i class="fas fa-ticket-alt"></i> My Bookings</a>
+        <a href="#cats" onclick="document.getElementById('cats').scrollIntoView({behavior:'smooth'});return false;"><i class="fas fa-list"></i> Categories</a>
+        <a href="#con" onclick="document.getElementById('con').scrollIntoView({behavior:'smooth'});return false;"><i class="fas fa-phone"></i> Contact</a>
+    </div>
+    <div class="nb-r">
+        <div class="upill">
+            <div class="uav" th:text="${#strings.substring(#authentication.name,0,1).toUpperCase()}"></div>
+            <span th:text="${#authentication.name}"></span>
+        </div>
+        <a th:href="@{/users/logout}" class="lo-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+</nav>
+
+<section class="hero">
+    <div class="h-badge"><span class="h-dot"></span> Online Booking Now Available in Nepal</div>
+    <h1>Travel Nepal with<br><em>Comfort &amp; Ease</em></h1>
+    <p>Browse available Hiaces, pick your seat and pay securely with eSewa — all in one place.</p>
+    <div class="h-btns">
+        <a th:href="@{/hiaces}" class="h-btn1"><i class="fas fa-shuttle-van"></i> Browse &amp; Book Hiaces</a>
+        <a href="#cats" class="h-btn2" onclick="document.getElementById('cats').scrollIntoView({behavior:'smooth'});return false;"><i class="fas fa-list"></i> View Categories</a>
+    </div>
+    <div class="h-stats">
+        <div class="h-stat">
+            <div class="n" th:text="${happyPassengerCount != null} ? ${happyPassengerCount}+'+' : '0+'"></div>
+            <div class="lb">Happy Passengers</div>
+        </div>
+        <div class="h-stat">
+            <div class="n" th:text="${routes != null} ? ${routes.size()}+'+' : '0+'"></div>
+            <div class="lb">Active Routes</div>
+        </div>
+        <div class="h-stat"><div class="n">2</div><div class="lb">Categories</div></div>
+        <div class="h-stat"><div class="n">100%</div><div class="lb">Secure Payment</div></div>
+    </div>
+</section>
+
+<!-- FLEET GALLERY -->
+<div class="fleet-sec">
+    <div class="fleet-hd">
+        <div class="ftag"><i class="fas fa-shuttle-van"></i> Our Fleet</div>
+        <h2>OUR FLEET GALLERY</h2>
+        <p>Premium Toyota Hiace vehicles for your comfortable journey</p>
+    </div>
+
+    <div th:if="${allHiaces != null and not #lists.isEmpty(allHiaces)}" class="fleet-wrap">
+
+        <div class="slide-counter">
+            <span id="slideCounter">1 / <span th:text="${#lists.size(allHiaces)}">1</span></span>
+        </div>
+
+        <!-- Main slider -->
+        <div class="fleet-track" id="ft">
+            <div th:each="h, i : ${allHiaces}"
+                 class="fslide"
+                 th:class="${i.index == 0} ? 'fslide active' : 'fslide'"
+                 th:id="'fs'+${i.index}"
+                 th:attr="data-img=${h.imageName != null} ? '/uploads/'+${h.imageName} : ''">
+                <div class="finfo">
+                    <div class="fi-left">
+                        <div class="fcat" th:classappend="${h.category}" th:text="${h.category}"></div>
+                        <div class="fveh" th:text="'Toyota Hiace — ' + ${h.vehicleNumber}"></div>
+                        <div class="fmeta">
+                            <span><i class="fas fa-user-tie"></i><span th:text="${h.driverName}"></span></span>
+                            <span><i class="fas fa-chair"></i><span th:text="${h.totalSeats} + ' seats'"></span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button class="farr prev" id="btnPrev" aria-label="Previous"><i class="fas fa-chevron-left"></i></button>
+        <button class="farr next" id="btnNext" aria-label="Next"><i class="fas fa-chevron-right"></i></button>
+
+        <!-- ROAD – Hiace moves from RIGHT (start dot) to LEFT (flag) -->
+        <div class="road-wrap">
+            <div class="road-surface">
+                <div class="road-dashes"></div>
+                <div class="road-start"></div>        <!-- start dot – RIGHT -->
+                <div class="road-hiace" id="roadHiace">🚐</div>   <!-- moves right→left -->
+                <div class="road-flag">🏁</div>        <!-- destination – LEFT -->
+            </div>
+            <div class="road-label" id="roadLabel">Starting journey...</div>
+        </div>
+
+        <div class="fdots">
+            <button th:each="h, i : ${allHiaces}"
+                    class="fdot"
+                    th:class="${i.index == 0} ? 'fdot on' : 'fdot'"
+                    th:id="'fd'+${i.index}"
+                    th:onclick="'goTo('+${i.index}+',1)'">
+            </button>
+        </div>
+
+        <div class="fthumbs">
+            <div th:each="h, i : ${allHiaces}"
+                 class="fthumb"
+                 th:class="${i.index == 0} ? 'fthumb on' : 'fthumb'"
+                 th:id="'fth'+${i.index}"
+                 th:onclick="'goTo('+${i.index}+(${i.index} > 0 ? ',1' : ',-1')+')'">
+                <img th:if="${h.imageName != null}" th:src="@{'/uploads/'+${h.imageName}}" th:alt="${h.vehicleNumber}">
+                <div th:unless="${h.imageName != null}" class="fph"><i class="fas fa-shuttle-van"></i></div>
+                <div class="ftlb" th:text="${h.vehicleNumber}"></div>
+            </div>
+        </div>
+
+        <div class="view-all-wrap">
+            <a th:href="@{/hiaces/list}" class="btn-view-all">
+                <i class="fas fa-th-large"></i> View All Hiaces
+            </a>
+        </div>
+
+    </div>
+
+    <div th:if="${allHiaces == null or #lists.isEmpty(allHiaces)}" class="fempty">
+        <i class="fas fa-shuttle-van"></i>
+        <p style="color:#64748b">No hiaces added yet. Admin can add from dashboard.</p>
+    </div>
+</div>
+
+<!-- STEPS, CATEGORIES, FEATURES, CTA, CONTACT, FOOTER -->
+<section class="sec sec-alt">
+    <div class="inn">
+        <div class="sh">
+            <div class="stag"><i class="fas fa-info-circle"></i> Simple Process</div>
+            <h2>How It Works</h2>
+            <p>Book your Hiace seat in 4 easy steps</p>
+            <div class="uline"></div>
+        </div>
+        <div class="sg">
+            <div class="sc"><div class="sn">1</div><div class="si">🔍</div><h3>Search Route</h3><p>Enter source and destination to find available Hiaces on your route.</p></div>
+            <div class="sc"><div class="sn">2</div><div class="si">🚐</div><h3>Choose Hiace</h3><p>Browse vehicles, compare prices and read reviews before booking.</p></div>
+            <div class="sc"><div class="sn">3</div><div class="si">💺</div><h3>Select Your Seat</h3><p>Pick your preferred seat from the interactive Hiace seat map.</p></div>
+            <div class="sc"><div class="sn">4</div><div class="si">💚</div><h3>Pay with eSewa</h3><p>Complete your booking securely and receive email confirmation.</p></div>
+        </div>
+    </div>
+</section>
+
+<section class="sec" id="cats">
+    <div class="inn">
+        <div class="sh">
+            <div class="stag"><i class="fas fa-tags"></i> Seat Types</div>
+            <h2>Available Categories</h2>
+            <p>Choose the comfort level that suits you best</p>
+            <div class="uline"></div>
+        </div>
+        <div class="cg">
+            <a th:href="@{/hiaces(category='DELUXE')}" class="cc dx">
+                <div class="cci"><span class="cic">⭐</span><div class="cnm">DELUXE</div><p class="cds">Air-conditioned, premium seats with extra legroom and comfort for a luxury travel experience.</p></div>
+                <div class="cst">Browse DELUXE Hiaces →</div>
+            </a>
+            <a th:href="@{/hiaces(category='NORMAL')}" class="cc nm">
+                <div class="cci"><span class="cic">🚐</span><div class="cnm">NORMAL</div><p class="cds">Comfortable standard seats at affordable prices — great value for everyday travel.</p></div>
+                <div class="cst">Browse NORMAL Hiaces →</div>
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="sec sec-alt">
+    <div class="inn">
+        <div class="sh">
+            <div class="stag"><i class="fas fa-star"></i> Why Us</div>
+            <h2>Why Choose Hiace Booking?</h2>
+            <p>Everything you need for a smooth journey</p>
+            <div class="uline"></div>
+        </div>
+        <div class="fg">
+            <div class="fc"><div class="fic"><i class="fas fa-bus"></i></div><h3>Comfortable Rides</h3><p>Travel in clean, well-maintained Hiaces with ample space on every journey.</p></div>
+            <div class="fc"><div class="fic"><i class="fas fa-mobile-alt"></i></div><h3>Easy Online Booking</h3><p>Book from anywhere using our simple and fast online booking system.</p></div>
+            <div class="fc"><div class="fic"><i class="fas fa-chair"></i></div><h3>Choose Your Seat</h3><p>Pick any available seat on our interactive Hiace seat map before confirming.</p></div>
+            <div class="fc"><div class="fic"><i class="fas fa-lock"></i></div><h3>Secure eSewa Payment</h3><p>Pay safely with eSewa and receive instant email confirmation.</p></div>
+            <div class="fc"><div class="fic"><i class="fas fa-envelope"></i></div><h3>Email Notifications</h3><p>Get booking confirmations and updates sent straight to your inbox.</p></div>
+            <div class="fc"><div class="fic"><i class="fas fa-star"></i></div><h3>Verified Reviews</h3><p>Read honest star ratings from real passengers who travelled with us.</p></div>
+        </div>
+    </div>
+</section>
+
+<section class="cta">
+    <h2>Ready to Start Your Journey?</h2>
+    <p>Browse all available Hiaces, pick your seat and book in minutes!</p>
+    <div class="cta-btns">
+        <a th:href="@{/hiaces}" class="cb1"><i class="fas fa-shuttle-van"></i> Browse &amp; Book Hiaces Now</a>
+        <a th:href="@{/booking/my-bookings}" class="cb2"><i class="fas fa-ticket-alt"></i> My Bookings</a>
+    </div>
+</section>
+
+<section class="sec sec-alt" id="con">
+    <div class="inn">
+        <div class="sh">
+            <div class="stag"><i class="fas fa-headset"></i> Support</div>
+            <h2>Contact Us</h2>
+            <p>We are here to help you anytime</p>
+            <div class="uline"></div>
+        </div>
+        <div class="cog">
+            <div class="coc"><span class="ci">📞</span><h4>Phone</h4><p>+977-9825998116</p><p style="font-size:12px;color:#94a3b8;margin-top:4px">Mon–Sat, 4am–8pm</p></div>
+            <div class="coc"><span class="ci">📧</span><h4>Email</h4><p>robishniarula5@gmail.com.com</p><p style="font-size:12px;color:#94a3b8;margin-top:4px">Reply within 24 hours</p></div>
+            <div class="coc"><span class="ci">📍</span><h4>Location</h4><p>Kathmandu, Nepal</p><p style="font-size:12px;color:#94a3b8;margin-top:4px">New Baneshwor, KTM</p></div>
+            <div class="coc"><span class="ci">🕐</span><h4>Working Hours</h4><p>24 * 7</p><p style="font-size:12px;color:#94a3b8;margin-top:4px">7 days a week</p></div>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="fg2">
+        <div class="fb">
+            <div class="fl"><div class="fli">🚐</div><div class="flt">Hiace<b>Booking</b></div></div>
+            <p>Nepal's trusted online Hiace seat booking platform. Fast, easy and secure.</p>
+        </div>
+        <div class="fcol">
+            <h4>Navigation</h4>
+            <a th:href="@{/home}">🏠 Home</a>
+            <a th:href="@{/routes}">🗺️ Routes</a>
+            <a th:href="@{/hiaces}">🚐 View Hiaces</a>
+            <a th:href="@{/booking/my-bookings}">📋 My Bookings</a>
+        </div>
+        <div class="fcol">
+            <h4>Payment</h4>
+            <p>💚 eSewa Integrated</p>
+            <p>🔒 256-bit SSL Secure</p>
+            <p>⚡ Instant Confirmation</p>
+            <p>📧 Email Notification</p>
+        </div>
+        <div class="fcol">
+            <h4>Account</h4>
+            <a th:href="@{/booking/my-bookings}">My Bookings</a>
+            <a th:href="@{/hiaces}">Browse Hiaces</a>
+            <a th:href="@{/users/logout}">Logout</a>
+            <a th:href="@{/users/admin/login}">Admin Login</a>
+        </div>
+    </div>
+    <div class="fbot">
+        <p>© 2026 Hiace Booking System — BCA Project, Tribhuvan University</p>
+        <div class="fsoc">
+            <a href="#" class="fsb"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="fsb"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="fsb"><i class="fab fa-twitter"></i></a>
+        </div>
+    </div>
+</footer>
+
+<script>
+/* ── Set background images ── */
+document.querySelectorAll('.fslide').forEach(function(s){
+    var img = s.getAttribute('data-img');
+    if(img && img.trim() !== '')
+        s.style.backgroundImage = 'url("' + img + '")';
+    else
+        s.style.background = 'linear-gradient(135deg,#1e3a5f 0%,#1e40af 60%,#0f172a 100%)';
+});
+
+/* ── State ── */
+var slides  = Array.from(document.querySelectorAll('.fslide'));
+var dots    = document.querySelectorAll('.fdot');
+var thumbs  = document.querySelectorAll('.fthumb');
+var counter = document.getElementById('slideCounter');
+var roadHiace = document.getElementById('roadHiace');
+var roadLabel = document.getElementById('roadLabel');
+
+var total   = slides.length;
+var cur     = 0;
+var busy    = false;
+
+var DRIVE_MS  = 4000;
+var SLIDE_MS  = 750;
+
+var rafId       = null;
+var paused      = false;
+var pausedAt    = 0;
+
+/* ── Counter ── */
+function updateCounter(){
+    if(counter) counter.textContent = (cur+1)+' / '+total;
+}
+
+/* ── Road hiace position – moves from RIGHT (pct=0) to LEFT (pct=100) ── */
+function setHiacePos(pct){
+    if(!roadHiace) return;
+    pct = Math.max(0, Math.min(100, pct));
+    // right: 0% -> at right edge, 100% -> at left edge
+    roadHiace.style.right = pct + '%';
+    
+    if(pct > 80){
+        roadHiace.style.filter =
+            'drop-shadow(0 0 10px rgba(56,189,248,1)) '+
+            'drop-shadow(4px 0 6px rgba(56,189,248,.6)) '+
+            'drop-shadow(0 0 24px rgba(56,189,248,.5))';
+    } else {
+        roadHiace.style.filter =
+            'drop-shadow(0 0 8px rgba(56,189,248,.9)) '+
+            'drop-shadow(0 0 20px rgba(56,189,248,.5))';
+    }
+    if(roadLabel){
+        if(pct < 5)        roadLabel.textContent = 'Starting journey...';
+        else if(pct < 40)  roadLabel.textContent = 'Exploring our fleet...';
+        else if(pct < 75)  roadLabel.textContent = 'Almost there...';
+        else if(pct < 95)  roadLabel.textContent = 'Arriving at next Hiace!';
+        else               roadLabel.textContent = 'Switching...';
+    }
+}
+
+/* ── Slide change – slides come from RIGHT, exit LEFT ── */
+function changeSlide(nextIdx){
+    if(busy || total <= 1) return;
+    var next = (nextIdx + total) % total;
+    if(next === cur) { resetDrive(); return; }
+    busy = true;
+
+    var outgoing = slides[cur];
+    var incoming = slides[next];
+
+    slides.forEach(function(s){
+        s.classList.remove('active','go-left','go-right','from-right');
+        s.style.transition = '';
+    });
+
+    incoming.style.transition = 'none';
+    incoming.style.transform = 'translateX(100%)';
+    incoming.getBoundingClientRect();
+    incoming.style.transition = '';
+    incoming.classList.remove('from-right');
+
+    outgoing.classList.add('go-left');
+    incoming.classList.add('active');
+
+    cur = next;
+
+    dots.forEach(function(d){ d.classList.remove('on'); });
+    if(dots[cur]) dots[cur].classList.add('on');
+
+    thumbs.forEach(function(t){ t.classList.remove('on'); });
+    if(thumbs[cur]) thumbs[cur].classList.add('on');
+
+    updateCounter();
+
+    setTimeout(function(){
+        slides.forEach(function(s,i){
+            s.classList.remove('go-left','go-right','from-right','active');
+            s.style.transition = 'none';
+            s.style.transform  = (i === cur) ? 'translateX(0)' : 'translateX(100%)';
+            s.offsetHeight;
+            s.style.transition = '';
+        });
+        slides[cur].classList.add('active');
+        busy = false;
+        setHiacePos(0);
+        resetDrive();
+    }, SLIDE_MS + 50);
+}
+
+/* ── Drive animation – from RIGHT to LEFT ── */
+function startDrive(fromProgress){
+    cancelAnimationFrame(rafId);
+    var startPct = (fromProgress || 0) * 100;
+    var startTime = null;
+    var remaining = DRIVE_MS * (1 - (fromProgress || 0));
+
+    function step(ts){
+        if(paused) return;
+        if(!startTime) startTime = ts;
+        var elapsed = ts - startTime;
+        var pct = startPct + (elapsed / remaining) * (100 - startPct);
+        setHiacePos(pct);
+        if(pct >= 99.5){
+            setHiacePos(100);
+            changeSlide(cur + 1);
+        } else {
+            rafId = requestAnimationFrame(step);
+        }
+    }
+    rafId = requestAnimationFrame(step);
+}
+
+function resetDrive(){
+    cancelAnimationFrame(rafId);
+    setHiacePos(0);
+    pausedAt = 0;
+    paused = false;
+    startDrive(0);
+}
+
+function pauseDrive(){
+    if(paused) return;
+    paused = true;
+    cancelAnimationFrame(rafId);
+    var rightStr = roadHiace ? roadHiace.style.right : '0%';
+    pausedAt = parseFloat(rightStr) / 100 || 0;
+}
+
+function resumeDrive(){
+    if(!paused) return;
+    paused = false;
+    startDrive(pausedAt);
+}
+
+function goTo(idx, dir){
+    pauseDrive();
+    cancelAnimationFrame(rafId);
+    setHiacePos(0);
+    changeSlide(idx);
+}
+
+function fn(){ goTo(cur + 1, 1); }
+function fp(){ goTo(cur - 1, -1); }
+
+var btnNext = document.getElementById('btnNext');
+var btnPrev = document.getElementById('btnPrev');
+if(btnNext) btnNext.addEventListener('click', fn);
+if(btnPrev) btnPrev.addEventListener('click', fp);
+
+var fleet = document.getElementById('ft');
+if(fleet){
+    fleet.addEventListener('mouseenter', pauseDrive);
+    fleet.addEventListener('mouseleave', resumeDrive);
+}
+
+updateCounter();
+setHiacePos(0);
+startDrive(0);
+</script>
+</body>
+</html>

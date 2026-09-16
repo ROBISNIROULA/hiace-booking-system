@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Payment Successful - Hiace Booking</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box;
+            font-family:'Segoe UI', sans-serif; }
+
+        body {
+            background:linear-gradient(135deg,#f0f2f5,#e8f4fd);
+            display:flex; justify-content:center;
+            align-items:center; min-height:100vh; padding:20px;
+        }
+
+        .card {
+            background:white; border-radius:20px;
+            padding:45px 40px; max-width:460px; width:100%;
+            box-shadow:0 10px 40px rgba(0,0,0,0.12);
+            text-align:center;
+        }
+
+        /* Animated checkmark */
+        .success-circle {
+            width:90px; height:90px; border-radius:50%;
+            background:linear-gradient(135deg,#28a745,#20c997);
+            display:flex; align-items:center;
+            justify-content:center; margin:0 auto 20px;
+            font-size:42px;
+            box-shadow:0 8px 25px rgba(40,167,69,0.4);
+            animation:pop 0.5s ease;
+        }
+
+        @keyframes pop {
+            0%   { transform:scale(0); opacity:0; }
+            70%  { transform:scale(1.15); }
+            100% { transform:scale(1); opacity:1; }
+        }
+
+        h2 {
+            font-size:26px; font-weight:800;
+            color:#1e293b; margin-bottom:8px;
+        }
+        .subtitle {
+            font-size:14px; color:#64748b; margin-bottom:28px;
+        }
+
+        /* Details box */
+        .details-box {
+            background:#f8fafc; border-radius:14px;
+            padding:20px; margin-bottom:25px; text-align:left;
+        }
+        .detail-row {
+            display:flex; justify-content:space-between;
+            align-items:center; padding:10px 0;
+            border-bottom:1px solid #e2e8f0;
+            font-size:14px;
+        }
+        .detail-row:last-child { border-bottom:none; }
+        .detail-row .d-label { color:#64748b; }
+        .detail-row .d-value {
+            font-weight:700; color:#1e293b;
+        }
+        .detail-row .d-value.green { color:#28a745; }
+        .detail-row .d-value.blue  { color:#007bff; }
+
+        /* Status badge */
+        .status-confirmed {
+            background:#d4edda; color:#155724;
+            padding:4px 14px; border-radius:20px;
+            font-size:12px; font-weight:700;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            display:block; width:100%;
+            padding:14px; background:#007bff;
+            color:white; border:none; border-radius:12px;
+            font-size:15px; font-weight:700;
+            text-decoration:none; margin-bottom:10px;
+            transition:0.2s; cursor:pointer;
+        }
+        .btn-primary:hover {
+            background:#0056b3; transform:translateY(-1px);
+            box-shadow:0 6px 20px rgba(0,123,255,0.3);
+        }
+        .btn-outline {
+            display:block; width:100%;
+            padding:13px; background:white;
+            color:#007bff; border:2px solid #007bff;
+            border-radius:12px; font-size:14px;
+            font-weight:600; text-decoration:none;
+            transition:0.2s;
+        }
+        .btn-outline:hover { background:#eff6ff; }
+
+        /* Print note */
+        .print-note {
+            font-size:12px; color:#94a3b8;
+            margin-top:15px;
+            display:flex; align-items:center;
+            justify-content:center; gap:5px;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+
+    <div class="success-circle">✅</div>
+
+    <h2>Payment Successful!</h2>
+    <p class="subtitle">
+        Your booking has been confirmed. Safe travels! 🚐
+    </p>
+
+    <div class="details-box">
+        <div class="detail-row">
+            <span class="d-label">Status</span>
+            <span class="status-confirmed">
+                ✓ CONFIRMED
+            </span>
+        </div>
+        <div class="detail-row"
+             th:if="${refId != null and refId != ''}">
+            <span class="d-label">eSewa Reference</span>
+            <span class="d-value blue"
+                  th:text="${refId}">
+            </span>
+        </div>
+        <div class="detail-row"
+             th:if="${amount != null and amount != ''}">
+            <span class="d-label">Amount Paid</span>
+            <span class="d-value green"
+                  th:text="'Rs. ' + ${amount}">
+            </span>
+        </div>
+        <div class="detail-row">
+            <span class="d-label">Payment Method</span>
+            <span class="d-value">💚 eSewa</span>
+        </div>
+    </div>
+
+    <a th:href="@{/booking/my-bookings}"
+       class="btn-primary">
+        📋 View My Bookings
+    </a>
+    <a th:href="@{/home}"
+       class="btn-outline">
+        🏠 Back to Home
+    </a>
+
+    <p class="print-note">
+        🔒 Payment secured by eSewa
+    </p>
+
+</div>
+</body>
+</html>

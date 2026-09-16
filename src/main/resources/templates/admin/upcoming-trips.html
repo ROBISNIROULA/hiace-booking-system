@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upcoming Trips - Admin</title>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --p:#2563eb;--pd:#1d4ed8;--pl:#eff6ff;
+            --a:#f59e0b;--g:#10b981;--r:#ef4444;
+            --d:#0f172a;--d2:#1e293b;--m:#64748b;
+            --l:#f1f5f9;--w:#fff;
+            --sh:0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.06);
+            --shm:0 8px 32px rgba(0,0,0,.12);
+            --sidebar:260px;
+        }
+        *{margin:0;padding:0;box-sizing:border-box}
+        html{scroll-behavior:smooth}
+        body{font-family:'Segoe UI',system-ui,sans-serif;
+             background:#f0f4f8;color:#1e293b;display:flex;min-height:100vh}
+
+        /* SIDEBAR */
+        .sidebar{width:var(--sidebar);flex-shrink:0;
+            background:linear-gradient(180deg,#0f172a,#1e293b);
+            min-height:100vh;position:fixed;top:0;left:0;z-index:100;
+            display:flex;flex-direction:column;
+            box-shadow:4px 0 24px rgba(0,0,0,.25)}
+        .sb-brand{padding:24px 22px 20px;
+            border-bottom:1px solid rgba(255,255,255,.07)}
+        .sb-logo{display:flex;align-items:center;gap:12px;text-decoration:none}
+        .sb-icon{width:44px;height:44px;border-radius:13px;
+            background:linear-gradient(135deg,#2563eb,#38bdf8);
+            display:flex;align-items:center;justify-content:center;
+            font-size:22px;box-shadow:0 4px 14px rgba(37,99,235,.4)}
+        .sb-title{font-size:17px;font-weight:800;color:#fff}
+        .sb-title span{color:#38bdf8}
+        .sb-sub{font-size:11px;color:#475569;margin-top:2px}
+        .sb-admin{padding:14px 18px;margin:14px 16px;
+            background:rgba(255,255,255,.05);border-radius:12px;
+            border:1px solid rgba(255,255,255,.07);
+            display:flex;align-items:center;gap:10px}
+        .sb-av{width:36px;height:36px;border-radius:50%;
+            background:linear-gradient(135deg,#2563eb,#38bdf8);
+            color:#fff;display:flex;align-items:center;
+            justify-content:center;font-size:14px;font-weight:800}
+        .sb-admin-name{font-size:13px;font-weight:700;color:#e2e8f0}
+        .sb-admin-role{font-size:11px;color:#475569}
+        .sb-nav{flex:1;padding:8px 12px}
+        .sb-section{font-size:10px;font-weight:700;color:#475569;
+            text-transform:uppercase;letter-spacing:1.2px;padding:14px 10px 8px}
+        .sb-link{display:flex;align-items:center;gap:11px;
+            padding:11px 14px;border-radius:11px;text-decoration:none;
+            font-size:13.5px;font-weight:600;color:#94a3b8;
+            transition:.2s;margin-bottom:2px;position:relative}
+        .sb-link:hover{background:rgba(255,255,255,.06);color:#e2e8f0}
+        .sb-link.active{background:linear-gradient(135deg,rgba(37,99,235,.25),rgba(37,99,235,.12));
+            color:#60a5fa;border:1px solid rgba(37,99,235,.25)}
+        .sb-link.active:before{content:'';position:absolute;left:0;top:6px;
+            bottom:6px;width:3px;border-radius:0 3px 3px 0;
+            background:linear-gradient(180deg,#60a5fa,#38bdf8)}
+        .sb-link i{width:18px;text-align:center;font-size:14px}
+        .sb-footer{padding:16px;border-top:1px solid rgba(255,255,255,.06)}
+        .sb-logout{display:flex;align-items:center;gap:10px;
+            padding:11px 14px;border-radius:11px;text-decoration:none;
+            font-size:13.5px;font-weight:600;color:#94a3b8;transition:.2s;
+            width:100%;border:none;background:transparent;cursor:pointer}
+        .sb-logout:hover{background:rgba(239,68,68,.12);color:#fca5a5}
+
+        /* MAIN */
+        .main{margin-left:var(--sidebar);flex:1;display:flex;flex-direction:column}
+        .topbar{background:var(--w);height:64px;padding:0 30px;
+            display:flex;align-items:center;justify-content:space-between;
+            box-shadow:0 1px 0 #e2e8f0;position:sticky;top:0;z-index:50}
+        .tb-left h1{font-size:20px;font-weight:800;color:var(--d)}
+        .tb-left p{font-size:12px;color:var(--m);margin-top:1px}
+        .tb-right{display:flex;align-items:center;gap:10px}
+        .back-btn{display:flex;align-items:center;gap:7px;padding:8px 16px;
+            background:var(--l);color:var(--d);border-radius:9px;
+            text-decoration:none;font-size:13px;font-weight:600;transition:.2s}
+        .back-btn:hover{background:#e2e8f0}
+
+        .content{padding:28px 30px;flex:1}
+
+        /* FILTER BAR */
+        .filter-bar{background:var(--w);border-radius:14px;padding:16px 20px;
+            box-shadow:var(--sh);border:1px solid #e8edf5;margin-bottom:22px;
+            display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+        .filter-bar label{font-size:12px;font-weight:700;color:var(--m)}
+        .filter-input{padding:8px 14px;border:2px solid #e5e7eb;border-radius:9px;
+            font-size:13px;outline:none;transition:.2s;background:#fafafa}
+        .filter-input:focus{border-color:var(--p);background:#fff}
+        .filter-btn{padding:8px 18px;border-radius:9px;font-size:13px;
+            font-weight:700;cursor:pointer;border:none;transition:.2s}
+        .filter-btn.primary{background:linear-gradient(135deg,var(--p),#1e40af);
+            color:#fff;box-shadow:0 4px 12px rgba(37,99,235,.3)}
+        .filter-btn.secondary{background:var(--l);color:var(--m)}
+        .filter-btn:hover{transform:translateY(-1px)}
+
+        /* SUMMARY CARDS */
+        .summary-row{display:grid;grid-template-columns:repeat(4,1fr);
+            gap:14px;margin-bottom:24px}
+        .sum-card{background:var(--w);border-radius:14px;padding:18px 20px;
+            box-shadow:var(--sh);border:1px solid #e8edf5;
+            border-top:3px solid;display:flex;align-items:center;gap:14px}
+        .sum-card:nth-child(1){border-top-color:#2563eb}
+        .sum-card:nth-child(2){border-top-color:#10b981}
+        .sum-card:nth-child(3){border-top-color:#f59e0b}
+        .sum-card:nth-child(4){border-top-color:#8b5cf6}
+        .sum-icon{width:44px;height:44px;border-radius:12px;
+            display:flex;align-items:center;justify-content:center;font-size:18px}
+        .sum-card:nth-child(1) .sum-icon{background:#dbeafe;color:#2563eb}
+        .sum-card:nth-child(2) .sum-icon{background:#d1fae5;color:#059669}
+        .sum-card:nth-child(3) .sum-icon{background:#fef3c7;color:#d97706}
+        .sum-card:nth-child(4) .sum-icon{background:#ede9fe;color:#7c3aed}
+        .sum-num{font-size:22px;font-weight:900;color:var(--d);line-height:1}
+        .sum-lbl{font-size:11px;color:var(--m);margin-top:3px}
+
+        /* TRIPS TABLE */
+        .card{background:var(--w);border-radius:16px;
+            box-shadow:var(--sh);border:1px solid #e8edf5;overflow:hidden}
+        .card-head{padding:16px 22px;border-bottom:1px solid #f1f5f9;
+            display:flex;justify-content:space-between;align-items:center}
+        .card-head h2{font-size:15px;font-weight:800;color:var(--d);
+            display:flex;align-items:center;gap:8px}
+        .card-head h2 i{color:var(--p)}
+        .count-badge{background:var(--pl);color:var(--p);
+            padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700}
+
+        table{width:100%;border-collapse:collapse}
+        thead th{font-size:10.5px;font-weight:800;color:var(--m);
+            text-transform:uppercase;letter-spacing:.8px;
+            padding:11px 16px;background:#f8fafc;
+            border-bottom:2px solid #e8edf5;text-align:left}
+        tbody td{padding:14px 16px;border-bottom:1px solid #f1f5f9;
+            font-size:13px;vertical-align:middle}
+        tbody tr:last-child td{border-bottom:none}
+        tbody tr:hover td{background:#fafbff;transition:.15s}
+
+        /* Route cell */
+        .route-cell .route-main{font-weight:800;color:var(--d);font-size:14px}
+        .route-cell .route-sub{font-size:11px;color:var(--m);margin-top:2px}
+
+        /* Hiace cell */
+        .hiace-cell{display:flex;align-items:center;gap:10px}
+        .h-thumb{width:38px;height:38px;border-radius:9px;object-fit:cover;
+            border:1px solid #e2e8f0}
+        .h-thumb-ph{width:38px;height:38px;border-radius:9px;
+            background:linear-gradient(135deg,#dbeafe,#eff6ff);
+            display:flex;align-items:center;justify-content:center;
+            font-size:16px;color:#3b82f6;border:1px solid #e2e8f0}
+        .h-name{font-weight:700;color:var(--d);font-size:13px}
+        .h-driver{font-size:11px;color:var(--m);margin-top:1px}
+
+        /* Date badge */
+        .date-badge{display:inline-flex;align-items:center;gap:5px;
+            font-size:12px;font-weight:700;padding:5px 11px;border-radius:20px}
+        .date-badge.today{background:#fef3c7;color:#92400e}
+        .date-badge.soon{background:#d1fae5;color:#065f46}
+        .date-badge.later{background:#eff6ff;color:#1d4ed8}
+        .time-sub{font-size:11px;color:var(--m);margin-top:3px;
+            display:flex;align-items:center;gap:4px}
+
+        /* Seat progress */
+        .seat-wrap{min-width:120px}
+        .seat-bar{height:7px;border-radius:4px;background:#e2e8f0;
+            margin-bottom:5px;overflow:hidden}
+        .seat-fill{height:100%;border-radius:4px;transition:.4s}
+        .seat-fill.low{background:linear-gradient(90deg,#10b981,#34d399)}
+        .seat-fill.mid{background:linear-gradient(90deg,#f59e0b,#fbbf24)}
+        .seat-fill.high{background:linear-gradient(90deg,#ef4444,#f87171)}
+        .seat-txt{font-size:11px;color:var(--m);font-weight:600}
+        .seat-txt strong{color:var(--d)}
+
+        /* Category */
+        .cat-tag{font-size:10.5px;font-weight:800;padding:4px 11px;border-radius:20px}
+        .cat-tag.DELUXE{background:#fef3c7;color:#92400e}
+        .cat-tag.NORMAL{background:#d1fae5;color:#065f46}
+
+        /* Fare */
+        .fare-cell{font-weight:800;color:#059669;font-size:14px}
+
+        /* Action */
+        .btn-detail{padding:7px 16px;border-radius:9px;
+            background:linear-gradient(135deg,var(--p),#1e40af);
+            color:#fff;border:none;cursor:pointer;font-size:12px;
+            font-weight:700;text-decoration:none;
+            display:inline-flex;align-items:center;gap:6px;transition:.2s}
+        .btn-detail:hover{transform:translateY(-1px);
+            box-shadow:0 5px 16px rgba(37,99,235,.35)}
+
+        /* Empty */
+        .empty-cell{text-align:center;padding:60px!important;color:var(--m)}
+        .empty-cell i{font-size:40px;display:block;margin-bottom:14px;opacity:.3}
+        .empty-cell p{font-size:14px;font-weight:600}
+
+        @media(max-width:1100px){.summary-row{grid-template-columns:1fr 1fr}}
+        @media(max-width:640px){.summary-row{grid-template-columns:1fr}
+            .filter-bar{flex-direction:column;align-items:stretch}}
+    </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+    <div class="sb-brand">
+        <a href="/admin/dashboard" class="sb-logo">
+            <div class="sb-icon">🚐</div>
+            <div>
+                <div class="sb-title">Hiace<span>Booking</span></div>
+                <div class="sb-sub">Admin Panel</div>
+            </div>
+        </a>
+    </div>
+    <div class="sb-admin">
+        <div class="sb-av">A</div>
+        <div>
+            <div class="sb-admin-name">Administrator</div>
+            <div class="sb-admin-role">Super Admin</div>
+        </div>
+    </div>
+    <nav class="sb-nav">
+        <div class="sb-section">Main Menu</div>
+        <a th:href="@{/admin/dashboard}" class="sb-link">
+            <i class="fas fa-chart-line"></i> Dashboard
+        </a>
+        <a th:href="@{/admin/hiaces}" class="sb-link">
+            <i class="fas fa-shuttle-van"></i> Manage Hiaces
+        </a>
+        <a th:href="@{/admin/routes}" class="sb-link">
+            <i class="fas fa-route"></i> Manage Routes
+        </a>
+        <div class="sb-section">Bookings</div>
+        <a th:href="@{/admin/bookings}" class="sb-link">
+            <i class="fas fa-ticket-alt"></i> All Bookings
+        </a>
+        <a th:href="@{/admin/upcoming-trips}" class="sb-link active">
+            <i class="fas fa-calendar-alt"></i> Upcoming Trips
+        </a>
+        <div class="sb-section">Users</div>
+        <a th:href="@{/admin/users}" class="sb-link">
+            <i class="fas fa-users"></i> View Users
+        </a>
+    </nav>
+    <div class="sb-footer">
+        <a th:href="@{/users/logout}" class="sb-logout">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+    </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+    <header class="topbar">
+        <div class="tb-left">
+            <h1><i class="fas fa-calendar-alt"
+                   style="color:var(--p);margin-right:8px"></i>
+                Upcoming Trips</h1>
+            <p>All scheduled future trips and their booking status</p>
+        </div>
+        <div class="tb-right">
+            <a th:href="@{/admin/dashboard}" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </header>
+
+    <div class="content">
+
+        <!-- SUMMARY CARDS -->
+        <div class="summary-row">
+            <div class="sum-card">
+                <div class="sum-icon"><i class="fas fa-calendar-alt"></i></div>
+                <div>
+                    <div class="sum-num"
+                         th:text="${upcomingCount != null ?
+                         upcomingCount : 0}">0</div>
+                    <div class="sum-lbl">Total Upcoming Trips</div>
+                </div>
+            </div>
+            <div class="sum-card">
+                <div class="sum-icon"><i class="fas fa-chair"></i></div>
+                <div>
+                    <div class="sum-num" id="totalBooked">—</div>
+                    <div class="sum-lbl">Total Seats Booked</div>
+                </div>
+            </div>
+            <div class="sum-card">
+                <div class="sum-icon"><i class="fas fa-calendar-day"></i></div>
+                <div>
+                    <div class="sum-num" id="todayTrips">—</div>
+                    <div class="sum-lbl">Departing Today</div>
+                </div>
+            </div>
+            <div class="sum-card">
+                <div class="sum-icon"><i class="fas fa-star"></i></div>
+                <div>
+                    <div class="sum-num" id="deluxeTrips">—</div>
+                    <div class="sum-lbl">DELUXE Trips</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FILTER BAR -->
+        <form class="filter-bar" th:action="@{/admin/upcoming-trips}"
+              method="GET">
+            <label>Filter:</label>
+            <input class="filter-input" type="text"
+                   name="source" placeholder="From (source)"
+                   th:value="${param.source}">
+            <input class="filter-input" type="text"
+                   name="destination" placeholder="To (destination)"
+                   th:value="${param.destination}">
+            <input class="filter-input" type="date"
+                   name="fromDate" th:value="${param.fromDate}">
+            <button type="submit" class="filter-btn primary">
+                <i class="fas fa-search"></i> Search
+            </button>
+            <a th:href="@{/admin/upcoming-trips}"
+               class="filter-btn secondary"
+               style="text-decoration:none;padding:8px 18px;
+               border-radius:9px;font-size:13px;font-weight:700;
+               display:inline-flex;align-items:center;gap:6px;">
+                <i class="fas fa-times"></i> Clear
+            </a>
+        </form>
+
+        <!-- TRIPS TABLE -->
+        <div class="card">
+            <div class="card-head">
+                <h2><i class="fas fa-list"></i> Scheduled Trips</h2>
+                <span class="count-badge"
+                      th:text="${upcomingCount}+' trips'"></span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Route</th>
+                        <th>Hiace</th>
+                        <th>Departure Date &amp; Time</th>
+                        <th>Fare</th>
+                        <th>Seats Booked</th>
+                        <th>Category</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(upcomingTrips)}">
+                        <td colspan="8" class="empty-cell">
+                            <i class="fas fa-calendar-times"></i>
+                            <p>No upcoming trips scheduled yet.</p>
+                            <a th:href="@{/admin/routes}"
+                               style="display:inline-flex;align-items:center;
+                               gap:6px;margin-top:14px;padding:9px 20px;
+                               background:var(--pl);color:var(--p);
+                               border-radius:9px;font-size:13px;
+                               font-weight:700;text-decoration:none;">
+                                <i class="fas fa-plus"></i> Add a Route
+                            </a>
+                        </td>
+                    </tr>
+                    <tr th:each="trip, s : ${upcomingTrips}"
+                        th:attr="data-cat=${trip.hiace.category},
+                                 data-booked=${tripBookingMap[trip.routeId] != null ?
+                                 tripBookingMap[trip.routeId] : 0},
+                                 data-today=${trip.departureDate}">
+                        <td style="color:var(--m);font-weight:700;
+                                   font-size:12px;"
+                            th:text="${s.count}"></td>
+                        <td>
+                            <div class="route-cell">
+                                <div class="route-main">
+                                    <span th:text="${trip.source}"></span>
+                                    <span style="color:var(--p);margin:0 6px">
+                                        →
+                                    </span>
+                                    <span th:text="${trip.destination}"></span>
+                                </div>
+                                <div class="route-sub"
+                                     th:text="${trip.hiace.vehicleNumber}">
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="hiace-cell">
+                                <img th:if="${trip.hiace.imageName != null}"
+                                     th:src="@{'/uploads/'+
+                                     ${trip.hiace.imageName}}"
+                                     class="h-thumb"
+                                     th:alt="${trip.hiace.vehicleNumber}">
+                                <div th:unless="${trip.hiace.imageName != null}"
+                                     class="h-thumb-ph">🚐</div>
+                                <div>
+                                    <div class="h-name"
+                                         th:text="${trip.hiace.vehicleNumber}">
+                                    </div>
+                                    <div class="h-driver"
+                                         th:text="${trip.hiace.driverName}">
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="date-badge"
+                                  th:classappend="${trip.departureDate.isEqual(
+                                  #temporals.createToday())} ? 'today' :
+                                  (${trip.departureDate.isBefore(
+                                  #temporals.createToday().plusDays(3))}
+                                  ? 'soon' : 'later')">
+                                <i class="fas fa-calendar"></i>
+                                <span th:text="${#temporals.format(
+                                      trip.departureDate,'dd MMM yyyy')}">
+                                </span>
+                            </span>
+                            <div class="time-sub">
+                                <i class="fas fa-clock"></i>
+                                <span th:text="${trip.departureTime}"></span>
+                            </div>
+                        </td>
+                        <td class="fare-cell"
+                            th:text="'Rs. '+${trip.fare}"></td>
+                        <td>
+                            <div class="seat-wrap">
+                                <div class="seat-bar">
+                                    <div class="seat-fill"
+                                         th:with="pct=${trip.hiace.totalSeats > 0 ?
+                                         ((tripBookingMap[trip.routeId] != null ?
+                                         tripBookingMap[trip.routeId] : 0) * 100)
+                                         / trip.hiace.totalSeats : 0}"
+                                         th:classappend="${pct > 70} ? 'high' :
+                                         (${pct > 40} ? 'mid' : 'low')"
+                                         th:style="'width:'+${pct}+'%'">
+                                    </div>
+                                </div>
+                                <div class="seat-txt">
+                                    <strong th:text="${tripBookingMap[
+                                            trip.routeId] != null ?
+                                            tripBookingMap[trip.routeId] : 0}">
+                                    </strong>
+                                    /
+                                    <span th:text="${trip.hiace.totalSeats}">
+                                    </span>
+                                    booked
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="cat-tag"
+                                  th:classappend="${trip.hiace.category}"
+                                  th:text="${trip.hiace.category}">
+                            </span>
+                        </td>
+                        <td>
+                            <a th:href="@{/admin/trip-detail/
+                                        {id}(id=${trip.routeId})}"
+                               class="btn-detail">
+                                <i class="fas fa-eye"></i> View
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+// Compute summary cards from table rows
+(function(){
+    var rows = document.querySelectorAll('tbody tr[data-cat]');
+    var totalBooked = 0, todayCount = 0, deluxeCount = 0;
+    var today = new Date().toISOString().split('T')[0];
+    rows.forEach(function(r){
+        totalBooked += parseInt(r.getAttribute('data-booked')||'0');
+        if(r.getAttribute('data-today') === today) todayCount++;
+        if(r.getAttribute('data-cat') === 'DELUXE') deluxeCount++;
+    });
+    var tb = document.getElementById('totalBooked');
+    var tt = document.getElementById('todayTrips');
+    var dt = document.getElementById('deluxeTrips');
+    if(tb) tb.textContent = totalBooked;
+    if(tt) tt.textContent = todayCount;
+    if(dt) dt.textContent = deluxeCount;
+})();
+</script>
+</body>
+</html>

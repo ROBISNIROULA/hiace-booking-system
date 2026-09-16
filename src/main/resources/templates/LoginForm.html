@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Hiace Booking</title>
+    <style>
+        * {
+            margin: 0; padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .login-wrapper {
+            display: flex;
+            width: 850px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+        }
+
+        /* Left panel */
+        .login-left {
+            background: linear-gradient(160deg, #2563eb, #1d4ed8);
+            width: 380px;
+            padding: 50px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            color: white;
+        }
+        .login-left .brand {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+        .login-left .brand span { font-size: 36px; }
+        .login-left p {
+            font-size: 15px;
+            color: rgba(255,255,255,0.75);
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+        .feature .icon {
+            width: 40px; height: 40px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 10px;
+            display: flex; align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        .feature .text strong {
+            display: block;
+            font-size: 14px;
+        }
+        .feature .text span {
+            font-size: 12px;
+            color: rgba(255,255,255,0.65);
+        }
+
+        /* Right panel */
+        .login-right {
+            background: white;
+            flex: 1;
+            padding: 50px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .login-right h2 {
+            font-size: 26px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 6px;
+        }
+        .login-right .subtitle {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 35px;
+        }
+
+        /* Alert */
+        .alert-error {
+            background: #fff5f5;
+            border: 1px solid #fca5a5;
+            color: #dc2626;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .alert-success {
+            background: #f0fdf4;
+            border: 1px solid #86efac;
+            color: #16a34a;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+        .input-wrapper {
+            position: relative;
+        }
+        .input-wrapper .input-icon {
+            position: absolute;
+            left: 14px; top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+            color: #94a3b8;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 13px 14px 13px 42px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+            transition: 0.2s;
+            background: #fafafa;
+        }
+        .form-group input:focus {
+            border-color: #2563eb;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+        }
+
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            font-size: 13px;
+        }
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #64748b;
+            cursor: pointer;
+        }
+        .remember-me input { width: auto; padding: 0; }
+        .forgot-link {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .forgot-link:hover { text-decoration: underline; }
+
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            letter-spacing: 0.3px;
+        }
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(37,99,235,0.4);
+        }
+        .btn-login:active { transform: translateY(0); }
+
+        .divider {
+            text-align: center;
+            margin: 20px 0;
+            color: #94a3b8;
+            font-size: 13px;
+            position: relative;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            position: absolute;
+            top: 50%; width: 40%;
+            height: 1px; background: #e5e7eb;
+        }
+        .divider::before { left: 0; }
+        .divider::after { right: 0; }
+
+        .signup-link {
+            text-align: center;
+            font-size: 14px;
+            color: #64748b;
+        }
+        .signup-link a {
+            color: #2563eb;
+            font-weight: 700;
+            text-decoration: none;
+        }
+        .signup-link a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+<div class="login-wrapper">
+
+    <!-- Left panel -->
+    <div class="login-left">
+        <div class="brand">
+            <span>🚐</span> Hiace<br>Booking
+        </div>
+        <p>Nepal's easiest way to book your Hiace seat online.</p>
+
+        <div class="feature">
+            <div class="icon">💺</div>
+            <div class="text">
+                <strong>Choose Your Seat</strong>
+                <span>Pick any seat you prefer</span>
+            </div>
+        </div>
+        <div class="feature">
+            <div class="icon">🗺️</div>
+            <div class="text">
+                <strong>Multiple Routes</strong>
+                <span>KTM, Pokhara, Chitwan & more</span>
+            </div>
+        </div>
+        <div class="feature">
+            <div class="icon">💚</div>
+            <div class="text">
+                <strong>Pay with eSewa</strong>
+                <span>Fast & secure payment</span>
+            </div>
+        </div>
+        <div class="feature">
+            <div class="icon">📧</div>
+            <div class="text">
+                <strong>Instant Confirmation</strong>
+                <span>Email notification on booking</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right panel -->
+    <div class="login-right">
+        <h2>Welcome Back! 👋</h2>
+        <p class="subtitle">Login to book your seat</p>
+
+        <!-- Error message -->
+        <div class="alert-error" th:if="${param.error}">
+            ❌ Invalid username or password. Please try again.
+        </div>
+
+        <!-- Success message after signup -->
+        <div class="alert-success" th:if="${param.registered}">
+            ✅ Account created successfully! Please login.
+        </div>
+
+        <form th:action="@{/users/login}" method="POST">
+
+            <div class="form-group">
+                <label for="username">Username</label>
+                <div class="input-wrapper">
+                    <span class="input-icon">👤</span>
+                    <input type="text"
+                           id="username"
+                           name="username"
+                           placeholder="Enter your username"
+                           required
+                           autofocus>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="input-wrapper">
+                    <span class="input-icon">🔒</span>
+                    <input type="password"
+                           id="password"
+                           name="password"
+                           placeholder="Enter your password"
+                           required>
+                </div>
+            </div>
+
+            <div class="form-options">
+                <label class="remember-me">
+                    <input type="checkbox" name="remember-me">
+                    Remember me
+                </label>
+                <a href="#" class="forgot-link">Forgot password?</a>
+            </div>
+
+            <button type="submit" class="btn-login">
+                Login →
+            </button>
+        </form>
+
+        <div class="divider">or</div>
+
+        <p class="signup-link">
+            Don't have an account?
+            <a th:href="@{/users/signup}">Sign up here</a>
+        </p>
+    </div>
+
+</div>
+
+</body>
+</html>

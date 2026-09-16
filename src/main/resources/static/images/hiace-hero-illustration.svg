@@ -1,0 +1,49 @@
+<svg width="100%" viewBox="0 0 680 320" role="img" xmlns="http://www.w3.org/2000/svg">
+<title>Stylized illustration of a Hiace passenger van on a road</title>
+<desc>A flat-style illustration showing a white passenger van with blue windows driving on a road, with simple clouds and a sun in the background</desc>
+<defs>
+<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0%" stop-color="#1a56db"/>
+<stop offset="100%" stop-color="#0f172a"/>
+</linearGradient>
+</defs>
+<rect x="0" y="0" width="680" height="320" fill="url(#sky)"/>
+<circle cx="580" cy="60" r="34" fill="#38bdf8" opacity="0.35"/>
+<ellipse cx="120" cy="70" rx="46" ry="18" fill="#ffffff" opacity="0.12"/>
+<ellipse cx="160" cy="62" rx="34" ry="15" fill="#ffffff" opacity="0.12"/>
+<ellipse cx="340" cy="50" rx="40" ry="16" fill="#ffffff" opacity="0.1"/>
+<ellipse cx="375" cy="58" rx="28" ry="13" fill="#ffffff" opacity="0.1"/>
+<rect x="0" y="250" width="680" height="70" fill="#1e293b"/>
+<rect x="0" y="250" width="680" height="6" fill="#0f172a"/>
+<g>
+<rect x="40" y="258" width="50" height="6" fill="#475569"/>
+<rect x="140" y="258" width="50" height="6" fill="#475569"/>
+<rect x="240" y="258" width="50" height="6" fill="#475569"/>
+<rect x="340" y="258" width="50" height="6" fill="#475569"/>
+<rect x="440" y="258" width="50" height="6" fill="#475569"/>
+<rect x="540" y="258" width="50" height="6" fill="#475569"/>
+<rect x="620" y="258" width="50" height="6" fill="#475569"/>
+</g>
+<g>
+<rect x="150" y="120" width="330" height="100" rx="14" fill="#f8fafc"/>
+<rect x="150" y="120" width="330" height="100" rx="14" fill="none" stroke="#cbd5e1" stroke-width="2"/>
+<path d="M150 150 L195 100 L420 100 Q445 100 450 125 L480 150 Z" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+<path d="M205 108 L230 108 L222 148 L185 148 Z" fill="#38bdf8"/>
+<path d="M240 108 L300 108 L300 148 L240 148 Z" fill="#38bdf8"/>
+<path d="M310 108 L370 108 L370 148 L310 148 Z" fill="#38bdf8"/>
+<path d="M380 108 L418 108 Q436 108 441 124 L444 148 L380 148 Z" fill="#38bdf8"/>
+<rect x="160" y="160" width="60" height="38" rx="3" fill="#38bdf8"/>
+<rect x="230" y="160" width="60" height="38" rx="3" fill="#38bdf8"/>
+<rect x="300" y="160" width="60" height="38" rx="3" fill="#38bdf8"/>
+<rect x="370" y="160" width="60" height="38" rx="3" fill="#38bdf8"/>
+<rect x="150" y="205" width="330" height="10" fill="#e2e8f0"/>
+<rect x="455" y="155" width="22" height="14" rx="3" fill="#f59e0b"/>
+<rect x="150" y="155" width="14" height="14" rx="3" fill="#ef4444"/>
+</g>
+<circle cx="225" cy="232" r="26" fill="#0f172a"/>
+<circle cx="225" cy="232" r="12" fill="#64748b"/>
+<circle cx="410" cy="232" r="26" fill="#0f172a"/>
+<circle cx="410" cy="232" r="12" fill="#64748b"/>
+<ellipse cx="225" cy="248" rx="38" ry="6" fill="#0f172a" opacity="0.4"/>
+<ellipse cx="410" cy="248" rx="38" ry="6" fill="#0f172a" opacity="0.4"/>
+</svg>

@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Write a Review</title>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box;
+            font-family:'Segoe UI', sans-serif; }
+        body {
+            background:linear-gradient(135deg,#f0f2f5,#e8f4fd);
+            min-height:100vh; padding:30px 20px;
+            display:flex; justify-content:center;
+            align-items:flex-start;
+        }
+
+        .card {
+            background:white; border-radius:20px;
+            padding:40px; max-width:560px; width:100%;
+            box-shadow:0 10px 40px rgba(0,0,0,.1);
+        }
+
+        .card-header {
+            text-align:center; margin-bottom:30px;
+        }
+        .card-header .icon {
+            font-size:48px; margin-bottom:12px;
+            display:block;
+        }
+        .card-header h2 {
+            font-size:24px; font-weight:800;
+            color:#1e293b; margin-bottom:6px;
+        }
+        .card-header p {
+            font-size:14px; color:#64748b;
+        }
+
+        /* Star rating */
+        .star-section { margin-bottom:28px; }
+        .star-section label {
+            display:block; font-size:13px;
+            font-weight:700; color:#374151;
+            margin-bottom:12px; text-transform:uppercase;
+            letter-spacing:0.5px;
+        }
+
+        .stars {
+            display:flex; gap:8px;
+            justify-content:center; margin-bottom:10px;
+        }
+        .stars input[type="radio"] { display:none; }
+        .stars label {
+            font-size:40px; cursor:pointer;
+            color:#e2e8f0; transition:0.15s;
+            text-transform:none; letter-spacing:0;
+            font-weight:normal;
+        }
+        .stars label:hover,
+        .stars label:hover ~ label,
+        .stars input[type="radio"]:checked ~ label {
+            color:#fbbf24;
+        }
+
+        /* Reverse order trick for CSS-only star rating */
+        .stars { flex-direction:row-reverse;
+                 justify-content:center; }
+        .stars label:hover,
+        .stars label:hover ~ label { color:#fbbf24; }
+        .stars input[type="radio"]:checked ~ label {
+            color:#fbbf24;
+        }
+
+        .star-hint {
+            text-align:center; font-size:13px;
+            color:#94a3b8; margin-top:6px;
+            min-height:20px;
+        }
+
+        /* Rating labels */
+        .rating-labels {
+            display:flex; justify-content:space-between;
+            font-size:11px; color:#94a3b8;
+            margin-top:8px; padding:0 4px;
+        }
+
+        /* Comment */
+        .form-group { margin-bottom:22px; }
+        .form-group label {
+            display:block; font-size:13px;
+            font-weight:700; color:#374151;
+            margin-bottom:8px; text-transform:uppercase;
+            letter-spacing:0.5px;
+        }
+        .form-group textarea {
+            width:100%; padding:14px;
+            border:2px solid #e5e7eb; border-radius:12px;
+            font-size:14px; outline:none; resize:vertical;
+            min-height:130px; transition:0.2s;
+            font-family:'Segoe UI', sans-serif;
+            color:#1e293b; line-height:1.6;
+        }
+        .form-group textarea:focus {
+            border-color:#f59e0b;
+            box-shadow:0 0 0 3px rgba(245,158,11,.1);
+        }
+        .char-count {
+            text-align:right; font-size:11px;
+            color:#94a3b8; margin-top:4px;
+        }
+
+        /* Quick tags */
+        .quick-tags {
+            display:flex; flex-wrap:wrap; gap:8px;
+            margin-bottom:22px;
+        }
+        .quick-tag {
+            padding:6px 14px; border:2px solid #e5e7eb;
+            border-radius:20px; font-size:12px;
+            font-weight:600; color:#64748b;
+            cursor:pointer; transition:0.2s; background:white;
+        }
+        .quick-tag:hover {
+            border-color:#f59e0b; color:#92400e;
+            background:#fffbeb;
+        }
+
+        /* Submit */
+        .btn-submit {
+            width:100%; padding:15px;
+            background:linear-gradient(135deg,#f59e0b,#d97706);
+            color:white; border:none; border-radius:12px;
+            font-size:16px; font-weight:700; cursor:pointer;
+            transition:0.2s; display:flex;
+            align-items:center; justify-content:center;
+            gap:8px; margin-bottom:12px;
+        }
+        .btn-submit:hover {
+            transform:translateY(-2px);
+            box-shadow:0 8px 25px rgba(245,158,11,.4);
+        }
+        .btn-back {
+            width:100%; padding:12px; background:#f1f5f9;
+            color:#64748b; border:none; border-radius:12px;
+            font-size:14px; cursor:pointer;
+            text-decoration:none; display:block;
+            text-align:center; font-weight:600;
+        }
+        .btn-back:hover { background:#e2e8f0; }
+
+        /* Progress indicator */
+        .rating-display {
+            text-align:center; font-size:15px;
+            font-weight:700; color:#f59e0b;
+            margin-top:8px; min-height:24px;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+
+    <div class="card-header">
+        <span class="icon">⭐</span>
+        <h2>Share Your Experience</h2>
+        <p>Help others by rating your Hiace journey</p>
+    </div>
+
+    <form th:action="@{/review/submit}" method="POST"
+          id="reviewForm">
+        <input type="hidden" name="bookingId"
+               th:value="${bookingId}">
+
+        <!-- Star Rating -->
+        <div class="star-section">
+            <label>Your Rating</label>
+
+            <!-- Stars — reverse order for CSS trick -->
+            <div class="stars">
+                <input type="radio" id="s5"
+                       name="rating" value="5"
+                       onchange="updateRating(5)">
+                <label for="s5" title="Excellent">★</label>
+
+                <input type="radio" id="s4"
+                       name="rating" value="4"
+                       onchange="updateRating(4)">
+                <label for="s4" title="Good">★</label>
+
+                <input type="radio" id="s3"
+                       name="rating" value="3"
+                       onchange="updateRating(3)">
+                <label for="s3" title="Average">★</label>
+
+                <input type="radio" id="s2"
+                       name="rating" value="2"
+                       onchange="updateRating(2)">
+                <label for="s2" title="Poor">★</label>
+
+                <input type="radio" id="s1"
+                       name="rating" value="1"
+                       onchange="updateRating(1)">
+                <label for="s1" title="Terrible">★</label>
+            </div>
+
+            <div class="rating-display" id="ratingDisplay">
+                Click a star to rate
+            </div>
+
+            <div class="rating-labels">
+                <span>Terrible</span>
+                <span>Poor</span>
+                <span>Average</span>
+                <span>Good</span>
+                <span>Excellent</span>
+            </div>
+        </div>
+
+        <!-- Quick tags -->
+        <div class="form-group">
+            <label>Quick Tags (optional)</label>
+            <div class="quick-tags">
+                <button type="button" class="quick-tag"
+                        onclick="addTag('Comfortable seats')">
+                    💺 Comfortable seats
+                </button>
+                <button type="button" class="quick-tag"
+                        onclick="addTag('On time departure')">
+                    ⏰ On time
+                </button>
+                <button type="button" class="quick-tag"
+                        onclick="addTag('Friendly driver')">
+                    👤 Friendly driver
+                </button>
+                <button type="button" class="quick-tag"
+                        onclick="addTag('Clean vehicle')">
+                    ✨ Clean vehicle
+                </button>
+                <button type="button" class="quick-tag"
+                        onclick="addTag('Smooth ride')">
+                    🛣️ Smooth ride
+                </button>
+                <button type="button" class="quick-tag"
+                        onclick="addTag('Good value')">
+                    💰 Good value
+                </button>
+            </div>
+        </div>
+
+        <!-- Comment -->
+        <div class="form-group">
+            <label>Your Review</label>
+            <textarea name="comment" id="commentBox"
+                      placeholder="Tell us about your journey experience..."
+                      maxlength="500"
+                      oninput="updateCount()"></textarea>
+            <div class="char-count">
+                <span id="charCount">0</span>/500 characters
+            </div>
+        </div>
+
+        <button type="submit" class="btn-submit"
+                id="submitBtn" disabled>
+            <i class="fas fa-paper-plane"></i>
+            Submit Review
+        </button>
+    </form>
+
+    <a th:href="@{/booking/my-bookings}"
+       class="btn-back">
+        ← Back to My Bookings
+    </a>
+
+</div>
+
+<script>
+    const labels = {
+        1: '😞 Terrible',
+        2: '😕 Poor',
+        3: '😐 Average',
+        4: '😊 Good',
+        5: '🤩 Excellent'
+    };
+
+    function updateRating(val) {
+        document.getElementById('ratingDisplay')
+            .textContent = labels[val];
+        document.getElementById('submitBtn')
+            .disabled = false;
+    }
+
+    function updateCount() {
+        const len = document.getElementById('commentBox')
+                             .value.length;
+        document.getElementById('charCount')
+            .textContent = len;
+    }
+
+    function addTag(text) {
+        const box = document.getElementById('commentBox');
+        const current = box.value.trim();
+        box.value = current
+            ? current + ' ' + text
+            : text;
+        updateCount();
+    }
+</script>
+</body>
+</html>

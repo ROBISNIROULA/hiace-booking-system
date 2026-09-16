@@ -1,0 +1,1535 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Seat - Hiace Booking</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="rgba(255,255,255,0.03)" width="100" height="100"/><path d="M10 10 L90 10 M10 20 L90 20 M10 30 L90 30" stroke="rgba(255,255,255,0.05)" stroke-width="1"/></svg>') repeat;
+            pointer-events: none;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
+            backdrop-filter: blur(10px);
+            padding: 0 30px;
+            height: 70px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .navbar-brand {
+            color: white;
+            font-size: 24px;
+            font-weight: 800;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .navbar-brand:hover {
+            transform: scale(1.05);
+        }
+
+        .navbar-brand i {
+            font-size: 28px;
+            color: #38bdf8;
+        }
+
+        .navbar-brand span {
+            color: #38bdf8;
+        }
+
+        .navbar-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .navbar-links a {
+            color: #cbd5e1;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .navbar-links a:hover {
+            background: rgba(56, 189, 248, 0.2);
+            color: #38bdf8;
+            transform: translateY(-2px);
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        /* Page Header */
+        .page-header {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .page-header h1 {
+            font-size: 42px;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 10px;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+            letter-spacing: -0.5px;
+        }
+
+        .page-header h1 i {
+            margin-right: 10px;
+            color: #fbbf24;
+        }
+
+        .page-header p {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Route Banner */
+        .route-banner {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.95), rgba(29, 78, 216, 0.95));
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 25px 30px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 40px rgba(37, 99, 235, 0.4);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            animation: fadeInUp 0.8s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .route-banner .route-name {
+            font-size: 28px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .route-banner .route-name .arrow {
+            font-size: 32px;
+            color: #fbbf24;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        .route-banner .route-details {
+            display: flex;
+            gap: 30px;
+            font-size: 14px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 12px 20px;
+            border-radius: 15px;
+        }
+
+        .route-banner .route-details span {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Vehicle Info Bar */
+        .info-bar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            animation: fadeInUp 0.8s ease 0.1s backwards;
+        }
+
+        .info-item {
+            text-align: center;
+            padding: 10px;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .info-item:hover {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            transform: translateY(-5px);
+        }
+
+        .info-item .lbl {
+            font-size: 12px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .info-item .val {
+            font-size: 18px;
+            font-weight: 800;
+            color: #1e293b;
+        }
+
+        .cat-tag {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 25px;
+            font-size: 13px;
+            font-weight: 700;
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% {
+                box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            }
+            50% {
+                box-shadow: 0 0 15px rgba(37, 99, 235, 0.3);
+            }
+        }
+
+        .cat-tag.DELUXE {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            color: #92400e;
+        }
+
+        .cat-tag.NORMAL {
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+            color: #065f46;
+        }
+
+        /* Main Grid */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 25px;
+            align-items: start;
+        }
+
+        /* Seat Map Card */
+        .seat-map-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            animation: fadeInUp 0.8s ease 0.2s backwards;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .seat-map-card h2 {
+            font-size: 24px;
+            font-weight: 800;
+            color: #1e293b;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #e2e8f0;
+        }
+
+        .seat-map-card h2 i {
+            color: #2563eb;
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            gap: 25px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+            justify-content: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            border-radius: 20px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: #475569;
+            font-weight: 600;
+            padding: 5px 12px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .legend-item:hover {
+            transform: translateY(-2px);
+            background: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .l-dot {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .l-dot.available {
+            background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+            border: 2px solid #94a3b8;
+        }
+
+        .l-dot.selected {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+
+        .l-dot.booked {
+            background: linear-gradient(135deg, #f87171, #ef4444);
+        }
+
+        .l-dot.driver {
+            background: linear-gradient(135deg, #34d399, #10b981);
+        }
+
+        .l-dot.extra {
+            background: linear-gradient(135deg, #c084fc, #a855f7);
+        }
+
+        /* Hiace Shell */
+        .hiace-shell {
+            background: linear-gradient(135deg, #334155, #1e293b);
+            border-radius: 25px;
+            padding: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .hiace-shell::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.05) 1%, transparent 1%);
+            background-size: 50px 50px;
+            pointer-events: none;
+        }
+
+        .hiace-inner {
+            background: #f8fafc;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Seat Table */
+        .seat-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 12px;
+        }
+
+        .seat {
+            width: 75px;
+            height: 75px;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            border: 3px solid transparent;
+            user-select: none;
+            position: relative;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin: 0 auto;
+        }
+
+        /* Square box effect */
+        .seat::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0));
+            pointer-events: none;
+        }
+
+        .seat .s-num {
+            font-size: 20px;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .seat .s-lbl {
+            font-size: 11px;
+            font-weight: 700;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        /* Available Seat */
+        .seat.available {
+            background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+            border-color: #94a3b8;
+            color: #475569;
+        }
+
+        .seat.available:hover {
+            background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+            border-color: #3b82f6;
+            color: #1d4ed8;
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 15px 30px rgba(59, 130, 246, 0.3);
+        }
+
+        /* Selected Seat */
+        .seat.selected {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            border-color: #1e40af;
+            color: white;
+            transform: translateY(-5px) scale(1.03);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
+            animation: selectPulse 0.5s ease;
+        }
+
+        @keyframes selectPulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.08);
+            }
+        }
+
+        /* Booked Seat */
+        .seat.booked {
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+            border-color: #f87171;
+            color: #dc2626;
+            cursor: not-allowed;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .seat.booked::after {
+            content: '✗';
+            position: absolute;
+            font-size: 40px;
+            opacity: 0.3;
+            font-weight: bold;
+        }
+
+        /* Driver Seat */
+        .seat.driver-seat {
+            background: linear-gradient(135deg, #34d399, #10b981);
+            border-color: #059669;
+            color: white;
+            cursor: default;
+            width: 100%;
+            height: 100%;
+            min-height: 162px;
+        }
+
+        .seat.driver-seat .s-num {
+            font-size: 32px;
+        }
+
+        /* Extra Seats (A and B) */
+        .seat.extra-seat {
+            background: linear-gradient(135deg, #c084fc, #a855f7);
+            border-color: #7c3aed;
+            color: white;
+        }
+
+        .seat.extra-seat:not(.booked):hover {
+            background: linear-gradient(135deg, #a855f7, #9333ea);
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 15px 30px rgba(168, 85, 247, 0.3);
+        }
+
+        .seat.extra-seat.selected {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+        }
+
+        /* Windshield Column - positioned in front of A, B, and Driver seats */
+        .windshield-column {
+            background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            padding: 20px 10px;
+            height: 100%;
+            min-height: 300px;
+            box-shadow: inset 0 2px 10px rgba(255, 255, 255, 0.3), 0 5px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .windshield-column::before {
+            content: '';
+            position: absolute;
+            top: -100%;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shineVertical 3s infinite;
+        }
+
+        @keyframes shineVertical {
+            0% {
+                top: -100%;
+            }
+            20%, 100% {
+                top: 100%;
+            }
+        }
+
+        .windshield-column i {
+            font-size: 32px;
+            color: #0c4a6e;
+        }
+
+        .windshield-column span {
+            font-size: 14px;
+            font-weight: 800;
+            color: #0c4a6e;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            letter-spacing: 4px;
+        }
+
+        /* Special Cells */
+        .cell-way {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 800;
+            color: #64748b;
+            letter-spacing: 10px;
+            padding: 25px 0;
+            background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+            border-radius: 12px;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .cell-way i {
+            color: #f59e0b;
+            margin: 0 5px;
+        }
+
+        .cell-door {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border: 2px solid #f59e0b;
+            border-radius: 12px;
+            height: 75px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 800;
+            color: #92400e;
+            gap: 5px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .cell-door i {
+            font-size: 24px;
+        }
+
+        .cell-empty {
+            width: 75px;
+            height: 75px;
+        }
+
+        .hiace-bumper {
+            background: linear-gradient(135deg, #475569, #1e293b);
+            height: 20px;
+            border-radius: 0 0 15px 15px;
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hiace-bumper::before {
+            content: '●●●';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #64748b;
+            font-size: 12px;
+            letter-spacing: 5px;
+        }
+
+        /* Driver cell styling */
+        .driver-cell {
+            vertical-align: middle;
+        }
+
+        /* Windshield cell */
+        .windshield-cell {
+            vertical-align: middle;
+            width: 100px;
+        }
+
+        /* Booking Panel */
+        .booking-panel {
+            position: sticky;
+            top: 20px;
+            animation: fadeInUp 0.8s ease 0.3s backwards;
+        }
+
+        .summary-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.25);
+        }
+
+        .summary-card h3 {
+            font-size: 24px;
+            font-weight: 800;
+            color: #1e293b;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .summary-card h3 i {
+            color: #2563eb;
+        }
+
+        .s-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 15px;
+            padding: 8px 0;
+            transition: all 0.3s ease;
+        }
+
+        .s-row:hover {
+            transform: translateX(5px);
+        }
+
+        .s-row .s-lbl {
+            color: #64748b;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .s-row .s-val {
+            font-weight: 800;
+            color: #1e293b;
+        }
+
+        .seat-display {
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+            border: 2px solid #bfdbfe;
+            border-radius: 15px;
+            padding: 15px;
+            min-height: 70px;
+            margin: 20px 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .seat-display .placeholder {
+            color: #64748b;
+            font-size: 14px;
+            font-style: italic;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .seat-chip {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 15px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .seat-chip .x {
+            cursor: pointer;
+            font-size: 20px;
+            font-weight: bold;
+            line-height: 1;
+            opacity: 0.8;
+            transition: all 0.2s ease;
+        }
+
+        .seat-chip .x:hover {
+            opacity: 1;
+            transform: scale(1.2) rotate(90deg);
+        }
+
+        .total-box {
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            border: 2px solid #86efac;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .total-box:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 25px rgba(34, 197, 94, 0.2);
+        }
+
+        .total-box .t-lbl {
+            font-size: 14px;
+            color: #166534;
+            margin-bottom: 8px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .total-box .t-amt {
+            font-size: 38px;
+            font-weight: 900;
+            color: #15803d;
+            letter-spacing: -1px;
+        }
+
+        .total-box .t-note {
+            font-size: 12px;
+            color: #4ade80;
+            margin-top: 8px;
+        }
+
+        .auto-suggest {
+            background: linear-gradient(135deg, #fffbeb, #fef3c7);
+            border: 1px solid #fcd34d;
+            border-radius: 15px;
+            padding: 15px;
+            font-size: 14px;
+            color: #92400e;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .auto-suggest:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(251, 191, 36, 0.2);
+        }
+
+        .auto-suggest i {
+            font-size: 20px;
+            color: #f59e0b;
+        }
+
+        .btn-pay {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-pay::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-pay:hover::before {
+            left: 100%;
+        }
+
+        .btn-pay:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-pay:disabled {
+            background: linear-gradient(135deg, #94a3b8, #64748b);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-auto {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            color: #059669;
+            border: 2px solid #86efac;
+            border-radius: 15px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-auto:hover {
+            background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+            border-color: #4ade80;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(34, 197, 94, 0.3);
+        }
+
+        .tips {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border: 1px solid #bae6fd;
+            border-radius: 15px;
+            padding: 18px;
+            font-size: 13px;
+            color: #0369a1;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .tips:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(14, 165, 233, 0.2);
+        }
+
+        .tips strong {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .tips ul {
+            padding-left: 25px;
+            margin-top: 10px;
+        }
+
+        .tips li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .tips li i {
+            margin-right: 8px;
+            color: #0284c7;
+        }
+
+        /* Responsive */
+        @media (max-width: 1100px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .booking-panel {
+                position: static;
+            }
+            
+            .info-bar {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .seat {
+                width: 65px;
+                height: 65px;
+            }
+            
+            .seat .s-num {
+                font-size: 16px;
+            }
+            
+            .cell-way {
+                font-size: 14px;
+                letter-spacing: 5px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+            
+            .navbar {
+                padding: 0 20px;
+                height: 60px;
+            }
+            
+            .navbar-brand {
+                font-size: 18px;
+            }
+            
+            .navbar-brand i {
+                font-size: 22px;
+            }
+            
+            .page-header h1 {
+                font-size: 28px;
+            }
+            
+            .route-banner .route-name {
+                font-size: 20px;
+            }
+            
+            .seat {
+                width: 55px;
+                height: 55px;
+            }
+            
+            .seat .s-num {
+                font-size: 14px;
+            }
+            
+            .seat-table {
+                border-spacing: 8px;
+            }
+            
+            .cell-way {
+                font-size: 10px;
+                letter-spacing: 3px;
+                padding: 15px 0;
+            }
+            
+            .info-bar {
+                grid-template-columns: 1fr;
+            }
+            
+            .legend {
+                gap: 15px;
+            }
+            
+            .legend-item {
+                font-size: 11px;
+            }
+            
+            .l-dot {
+                width: 22px;
+                height: 22px;
+            }
+            
+            .windshield-column {
+                min-height: 200px;
+                padding: 10px 5px;
+            }
+            
+            .windshield-column i {
+                font-size: 20px;
+            }
+            
+            .windshield-column span {
+                font-size: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="/home" class="navbar-brand">
+            <i class="fas fa-van-shuttle"></i> Hiace<span>Booking</span>
+        </a>
+        <div class="navbar-links">
+            <a href="/home"><i class="fas fa-home"></i> Home</a>
+            <a href="/booking/my-bookings"><i class="fas fa-ticket-alt"></i> My Bookings</a>
+            <a href="/users/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1><i class="fas fa-chair"></i> Select Your Seats</h1>
+            <p>Choose your preferred seat from the Hiace layout below</p>
+        </div>
+        <!-- Error message -->
+<div th:if="${errorMsg}"
+     style="background:#fff5f5;border:1px solid #fca5a5;
+            color:#dc2626;padding:12px 16px;border-radius:10px;
+            margin-bottom:15px;font-size:13px;
+            display:flex;align-items:center;gap:8px;">
+    <span th:text="${errorMsg}"></span>
+</div>
+
+<!-- Warning message -->
+<div th:if="${warningMsg}"
+     style="background:#fffbeb;border:1px solid #fcd34d;
+            color:#92400e;padding:12px 16px;border-radius:10px;
+            margin-bottom:15px;font-size:13px;
+            display:flex;align-items:center;gap:8px;">
+    <span th:text="${warningMsg}"></span>
+</div>
+
+        <!-- Dynamic Route Banner - Fetched from backend -->
+<!-- Route banner -->
+<div class="route-banner">
+    <div class="banner-top">
+        <div class="route-name">
+            <span th:text="${route.source}"></span>
+            <span class="arrow">→</span>
+            <span th:text="${route.destination}"></span>
+        </div>
+        <span style="background:rgba(255,255,255,0.15);
+                     padding:5px 14px;border-radius:20px;
+                     font-size:12px;font-weight:600;color:white;">
+            <span th:text="${route.hiace.category}"></span>
+        </span>
+    </div>
+    <div class="route-meta">
+        <!-- DATE — NEW -->
+        <span>
+            📅
+            <strong th:text="${route.departureDate != null} ?
+                ${#temporals.format(route.departureDate,'EEE, dd MMM yyyy')}
+                : 'Date not set'">
+            </strong>
+        </span>
+        <span>
+            🕐
+            <strong th:text="${route.departureTime}"></strong>
+        </span>
+        <span>
+            🚐
+            <strong th:text="${route.hiace.vehicleNumber}"></strong>
+        </span>
+        <span>
+            👤
+            <strong th:text="${route.hiace.driverName}"></strong>
+        </span>
+    </div>
+</div>
+
+        <!-- Dynamic Vehicle Info Bar - Fetched from backend -->
+<!-- Info bar -->
+<div class="info-bar">
+    <div class="info-item">
+        <div class="lbl">Vehicle No.</div>
+        <div class="val"
+             th:text="${route.hiace.vehicleNumber}">
+        </div>
+    </div>
+    <div class="info-item">
+        <div class="lbl">Category</div>
+        <div class="val"
+             th:text="${route.hiace.category}">
+        </div>
+    </div>
+    <!-- DATE — NEW -->
+    <div class="info-item">
+        <div class="lbl">📅 Departure Date</div>
+        <div class="val"
+             style="color:#166534;font-weight:700;"
+             th:text="${route.departureDate != null} ?
+             ${#temporals.format(route.departureDate,'dd MMM yyyy')}
+             : 'Not set'">
+        </div>
+    </div>
+    <div class="info-item">
+        <div class="lbl">🕐 Departure Time</div>
+        <div class="val"
+             style="color:#1d4ed8;font-weight:700;"
+             th:text="${route.departureTime}">
+        </div>
+    </div>
+    <div class="info-item">
+        <div class="lbl">Fare / Seat</div>
+        <div class="val"
+             style="color:#2563eb;font-size:16px;"
+             th:text="'Rs. '+${route.fare}">
+        </div>
+    </div>
+</div>
+
+        <div class="main-grid">
+            <!-- Left: Seat Map -->
+            <div class="seat-map-card">
+                <h2><i class="fas fa-map-marked-alt"></i> Hiace Seat Layout</h2>
+
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="l-dot available"></div>
+                        <span>Available</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="l-dot selected"></div>
+                        <span>Selected</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="l-dot booked"></div>
+                        <span>Booked</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="l-dot driver"></div>
+                        <span>Driver</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="l-dot extra"></div>
+                        <span>Side Seat</span>
+                    </div>
+                </div>
+
+                <div class="hiace-shell">
+                    <div class="hiace-inner">
+                        <table class="seat-table">
+                            <tbody>
+                                <!-- Windshield Column - in front of A, B, and Driver seats -->
+                                <tr>
+                                    <!-- Windshield column that spans multiple rows -->
+                                    <td rowspan="4" class="windshield-cell" style="vertical-align: middle;">
+                                        <div class="windshield-column">
+                                            <i class="fas fa-tachometer-alt"></i>
+                                            <span>WINDSHIELD</span>
+                                            <i class="fas fa-tachometer-alt"></i>
+                                        </div>
+                                    </td>
+                                    
+                                    <!-- First row of seats after windshield -->
+                                    <td rowspan="2" class="driver-cell" style="vertical-align: middle;">
+                                        <div class="seat driver-seat">
+                                            <span class="s-num"><i class="fas fa-user-circle"></i></span>
+                                            <span class="s-lbl">DRIVER</span>
+                                        </div>
+                                    </td>
+                                    <td><div th:id="'seat-3'" th:class="${#lists.contains(bookedSeats, 3)} ? 'seat booked' : 'seat available'" th:onclick="${#lists.contains(bookedSeats, 3)} ? '' : 'toggleSeat(3)'"><span class="s-num">3</span><span class="s-lbl" th:text="${#lists.contains(bookedSeats, 3)} ? '✗' : '○'">○</span></div></td>
+                                    <td><div th:id="'seat-6'" th:class="${#lists.contains(bookedSeats, 6)} ? 'seat booked' : 'seat available'" th:onclick="${#lists.contains(bookedSeats, 6)} ? '' : 'toggleSeat(6)'"><span class="s-num">6</span><span class="s-lbl" th:text="${#lists.contains(bookedSeats, 6)} ? '✗' : '○'">○</span></div></td>
+                                    <td><div th:id="'seat-9'" th:class="${#lists.contains(bookedSeats, 9)} ? 'seat booked' : 'seat available'" th:onclick="${#lists.contains(bookedSeats, 9)} ? '' : 'toggleSeat(9)'"><span class="s-num">9</span><span class="s-lbl" th:text="${#lists.contains(bookedSeats, 9)} ? '✗' : '○'">○</span></div></td>
+                                    <td><div th:id="'seat-13'" th:class="${#lists.contains(bookedSeats, 13)} ? 'seat booked' : 'seat available'" th:onclick="${#lists.contains(bookedSeats, 13)} ? '' : 'toggleSeat(13)'"><span class="s-num">13</span><span class="s-lbl" th:text="${#lists.contains(bookedSeats, 13)} ? '✗' : '○'">○</span></div></td>
+                                </tr>
+
+                                <!-- Row 2: Seats 2,5,8,12 -->
+                                <tr>
+                                    <td><div th:id="'seat-2'" th:class="${#lists.contains(bookedSeats, 2)} ? 'seat booked' : 'seat available'" th:onclick="${#lists.contains(bookedSeats, 2)} ? '' : 'toggleSeat(2)'"><span class="s-num">2</span><span class="s-lbl" th:text="${#lists.contains(bookedSeats, 2)} ? '✗' : '○'">○</span></div></td>
+                                    <td><div th:id="'seat-5'" th:class="${#lists.contains(bookedSeats, 5)} ? 'seat booked' : 'seat available'" th:onclick="${#lists.contains(bookedSeats, 5)} ? '' : 'toggleSeat(5)'"><span class="s-num">5</span><span class="s-lbl" th:text="${#lists.contains(bookedSeats, 5)} ? '✗' : '○'">○</span></div></td>
+                                    <td><div th:id="'seat-8'" th:class="${#lists.contains(bookedSeats, 8)} ? 'seat booked' : 'seat available'" th:onclick="${#lists.contains(bookedSeats, 8)} ? '' : 'toggleSeat(8)'"><span class="s-num">8</span><span class="s-lbl" th:text="${#lists.contains(bookedSeats, 8)} ? '✗' : '○'">○</span></div></td>
+                                    <td><div th:id="'seat-12'" th:class="${#lists.contains(bookedSeats, 12)} ? 'seat booked' : 'seat available'" th:onclick="${#lists.contains(bookedSeats, 12)} ? '' : 'toggleSeat(12)'"><span class="s-num">12</span><span class="s-lbl" th:text="${#lists.contains(bookedSeats, 12)} ? '✗' : '○'">○</span></div></td>
+                                </tr>
+
+                                <!-- Row 3: B, 1, WAY, 11 -->
+                                <tr>
+                                   <td>
+    <div id="seat-B"
+         th:class="${#lists.contains(bookedSeats,14)} ?
+                   'seat extra-seat booked' :
+                   'seat extra-seat available'"
+         onclick="toggleSeat(14)">
+        <span class="s-num">B</span>
+        <span class="s-lbl"
+              th:text="${#lists.contains(bookedSeats,14)}
+                        ? '✗' : '○'">
+        </span>
+    </div>
+</td>
+                                    <td><div th:id="'seat-1'" th:class="${#lists.contains(bookedSeats, 1)} ? 'seat booked' : 'seat available'" th:onclick="${#lists.contains(bookedSeats, 1)} ? '' : 'toggleSeat(1)'"><span class="s-num">1</span><span class="s-lbl" th:text="${#lists.contains(bookedSeats, 1)} ? '✗' : '○'">○</span></div></td>
+                                    <td colspan="2"><div class="cell-way"><i class="fas fa-road"></i> W A Y <i class="fas fa-road"></i></div></td>
+                                    <td><div th:id="'seat-11'" th:class="${#lists.contains(bookedSeats, 11)} ? 'seat booked' : 'seat available'" th:onclick="${#lists.contains(bookedSeats, 11)} ? '' : 'toggleSeat(11)'"><span class="s-num">11</span><span class="s-lbl" th:text="${#lists.contains(bookedSeats, 11)} ? '✗' : '○'">○</span></div></td>
+                                </tr>
+
+                                <!-- Row 4: A, DOOR, 4, 7, 10 -->
+                                <tr>
+                                    <td>
+    <div id="seat-A"
+         th:class="${#lists.contains(bookedSeats,15)} ?
+                   'seat extra-seat booked' :
+                   'seat extra-seat available'"
+         onclick="toggleSeat(15)">
+        <span class="s-num">A</span>
+        <span class="s-lbl"
+              th:text="${#lists.contains(bookedSeats,15)}
+                        ? '✗' : '○'">
+        </span>
+    </div>
+</td>
+                                    <td><div class="cell-door"><i class="fas fa-door-open"></i><br>DOOR</div></td>
+                                    <td><div th:id="'seat-4'" th:class="${#lists.contains(bookedSeats, 4)} ? 'seat booked' : 'seat available'" th:onclick="${#lists.contains(bookedSeats, 4)} ? '' : 'toggleSeat(4)'"><span class="s-num">4</span><span class="s-lbl" th:text="${#lists.contains(bookedSeats, 4)} ? '✗' : '○'">○</span></div></td>
+                                    <td><div th:id="'seat-7'" th:class="${#lists.contains(bookedSeats, 7)} ? 'seat booked' : 'seat available'" th:onclick="${#lists.contains(bookedSeats, 7)} ? '' : 'toggleSeat(7)'"><span class="s-num">7</span><span class="s-lbl" th:text="${#lists.contains(bookedSeats, 7)} ? '✗' : '○'">○</span></div></td>
+                                    <td><div th:id="'seat-10'" th:class="${#lists.contains(bookedSeats, 10)} ? 'seat booked' : 'seat available'" th:onclick="${#lists.contains(bookedSeats, 10)} ? '' : 'toggleSeat(10)'"><span class="s-num">10</span><span class="s-lbl" th:text="${#lists.contains(bookedSeats, 10)} ? '✗' : '○'">○</span></div></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="hiace-bumper"></div>
+                </div>
+            </div>
+
+            <!-- Right: Booking Panel -->
+            <div class="booking-panel">
+                <div class="summary-card">
+                    <h3><i class="fas fa-receipt"></i> Booking Summary</h3>
+
+                    <div class="s-row">
+                        <span class="s-lbl"><i class="fas fa-route"></i> Route</span>
+                        <span class="s-val" th:text="${route.source}+' → '+${route.destination}">Loading...</span>
+                    </div>
+                    <div class="s-row">
+    <span class="s-lbl">📅 Date</span>
+    <span class="s-val"
+          style="color:#166534;"
+          th:text="${route.departureDate != null} ?
+          ${#temporals.format(route.departureDate,'dd MMM yyyy')}
+          : 'Not set'">
+    </span>
+</div>
+                    <div class="s-row">
+                        <span class="s-lbl"><i class="far fa-calendar-alt"></i> Departure</span>
+                        <span class="s-val" th:text="${route.departureTime}">Loading...</span>
+                    </div>
+                    <div class="s-row">
+                        <span class="s-lbl"><i class="fas fa-tag"></i> Category</span>
+                        <span class="s-val" th:text="${route.hiace.category}">Loading...</span>
+                    </div>
+                    <div class="s-row">
+                        <span class="s-lbl"><i class="fas fa-money-bill"></i> Fare / Seat</span>
+                        <span class="s-val" style="color:#2563eb; font-weight:800;" th:text="'Rs. '+${route.fare}">Loading...</span>
+                    </div>
+
+                    <hr style="margin: 20px 0; border: none; border-top: 2px solid #e2e8f0;">
+
+<!-- Selected seats display -->
+<div style="font-size:12px;font-weight:700;
+            color:#374151;margin-bottom:6px;">
+    Selected Seats:
+</div>
+<div class="seat-display" id="seatDisplay">
+    <span class="placeholder">No seat selected yet</span>
+</div>
+
+<!-- Total -->
+<div class="total-box">
+    <div class="t-lbl">Total Amount</div>
+    <div class="t-amt" id="totalAmt">0</div>
+    <div class="t-note" id="totalNote">
+        Select seats to see total
+    </div>
+</div>
+
+<!-- Auto suggest -->
+<div class="auto-suggest">
+    💡 Best available seat:
+    <strong th:text="'Seat ' + ${autoSeat}"></strong>
+</div>
+
+<!-- MULTIPLE SEATS FORM -->
+<form th:action="@{/booking/confirm-multiple}"
+      method="POST"
+      id="bookingForm">
+    <input type="hidden" name="routeId"
+           th:value="${route.routeId}">
+
+    <!--
+        Hidden inputs for selected seats are
+        injected here by JavaScript
+    -->
+    <div id="seatInputsContainer"></div>
+
+    <button type="submit"
+            class="btn-pay"
+            id="payBtn"
+            disabled>
+        <i class="fas fa-credit-card"></i>
+        Confirm &amp; Pay with eSewa
+    </button>
+</form>
+
+<!-- Auto assign single seat -->
+<form th:action="@{/booking/confirm}"
+      method="POST"
+      style="margin-top:10px;">
+    <input type="hidden" name="routeId"
+           th:value="${route.routeId}">
+    <input type="hidden" name="seatNumber"
+           th:value="${autoSeat}">
+    <button type="submit" class="btn-auto">
+        ⚡ Auto Assign
+        (Seat <span th:text="${autoSeat}"></span>)
+    </button>
+</form>
+
+<div class="tips">
+    <strong>💡 How to book:</strong>
+    <ul>
+        <li>Click any seat to select it</li>
+        <li>Click again to deselect</li>
+        <li>
+            <strong>Select multiple seats</strong>
+            for group booking
+        </li>
+        <li>🔴 Red = already booked</li>
+        <li>🟣 Purple = side seats (A &amp; B)</li>
+    </ul>
+</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script th:inline="javascript">
+    const fare = /*[[${route.fare}]]*/ 0;
+
+    // Maps internal seat number → DOM element ID suffix
+    const seatDomMap = {
+        14: 'B',
+        15: 'A'
+    };
+
+    // Maps internal seat number → display label
+    const seatLabelMap = {
+        14: 'B',
+        15: 'A'
+    };
+
+    // Stores selected seat numbers as a Set
+    let selectedSeats = new Set();
+
+    function toggleSeat(seatNum) {
+        // Build the correct DOM id
+        const suffix = seatDomMap[seatNum]
+                       ? seatDomMap[seatNum]
+                       : String(seatNum);
+        const el = document.getElementById('seat-' + suffix);
+
+        if (!el) {
+            console.warn('Seat element not found: seat-' + suffix);
+            return;
+        }
+        if (el.classList.contains('booked')) return;
+
+        if (selectedSeats.has(seatNum)) {
+            // ── Deselect ──────────────────────────────────
+            selectedSeats.delete(seatNum);
+            el.classList.remove('selected');
+            el.classList.add('available');
+            el.querySelector('.s-lbl').textContent = '○';
+        } else {
+            // ── Select ────────────────────────────────────
+            selectedSeats.add(seatNum);
+            el.classList.remove('available');
+            el.classList.add('selected');
+            el.querySelector('.s-lbl').textContent = '✓';
+        }
+
+        updatePanel();
+    }
+
+    function updatePanel() {
+        const display    = document.getElementById('seatDisplay');
+        const totalEl    = document.getElementById('totalAmt');
+        const noteEl     = document.getElementById('totalNote');
+        const payBtn     = document.getElementById('payBtn');
+        const container  =
+            document.getElementById('seatInputsContainer');
+
+        // Clear old hidden inputs
+        container.innerHTML = '';
+
+        if (selectedSeats.size > 0) {
+            let html = '';
+
+            selectedSeats.forEach(seatNum => {
+                const label = seatLabelMap[seatNum]
+                              ? seatLabelMap[seatNum]
+                              : seatNum;
+
+                // Seat chip with remove button
+                html += `
+                    <div class="seat-chip">
+                        Seat ${label}
+                        <span class="x"
+                              onclick="toggleSeat(${seatNum})">
+                            ×
+                        </span>
+                    </div>`;
+
+                // Hidden form input for this seat
+                const input = document.createElement('input');
+                input.type  = 'hidden';
+                input.name  = 'seatNumbers';
+                input.value = seatNum;
+                container.appendChild(input);
+            });
+
+            display.innerHTML = html;
+
+            const total = selectedSeats.size * fare;
+            totalEl.textContent =
+                'Rs. ' + total.toLocaleString();
+            noteEl.textContent  =
+                selectedSeats.size +
+                ' seat(s) × Rs. ' + fare;
+            payBtn.disabled = false;
+
+        } else {
+            display.innerHTML =
+                '<span class="placeholder">' +
+                'No seat selected yet</span>';
+            totalEl.textContent = '0';
+            noteEl.textContent  = 'Select seats to see total';
+            payBtn.disabled     = true;
+        }
+    }
+</script>
+
+</body>
+</html>

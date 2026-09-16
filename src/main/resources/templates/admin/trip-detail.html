@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trip Detail - Admin</title>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root{
+            --p:#2563eb;--pl:#eff6ff;
+            --g:#10b981;--r:#ef4444;--a:#f59e0b;
+            --d:#0f172a;--m:#64748b;--l:#f1f5f9;--w:#fff;
+            --sh:0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.06);
+            --sidebar:240px;
+        }
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Segoe UI',system-ui,sans-serif;
+             background:#f0f4f8;color:#1e293b;
+             display:flex;min-height:100vh}
+
+        /* ── SIDEBAR ── */
+        .sidebar{width:var(--sidebar);flex-shrink:0;
+            background:linear-gradient(180deg,#0f172a,#1e293b);
+            min-height:100vh;position:fixed;top:0;left:0;z-index:100;
+            display:flex;flex-direction:column;
+            box-shadow:4px 0 24px rgba(0,0,0,.25)}
+        .sb-brand{padding:22px 20px 18px;border-bottom:1px solid rgba(255,255,255,.07)}
+        .sb-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+        .sb-icon{width:40px;height:40px;border-radius:11px;
+            background:linear-gradient(135deg,#2563eb,#38bdf8);
+            display:flex;align-items:center;justify-content:center;font-size:19px}
+        .sb-title{font-size:16px;font-weight:800;color:#fff}
+        .sb-title span{color:#38bdf8}
+        .sb-admin{padding:12px 16px;margin:12px 14px;
+            background:rgba(255,255,255,.05);border-radius:10px;
+            border:1px solid rgba(255,255,255,.07);
+            display:flex;align-items:center;gap:9px}
+        .sb-av{width:32px;height:32px;border-radius:50%;
+            background:linear-gradient(135deg,#2563eb,#38bdf8);
+            color:#fff;display:flex;align-items:center;
+            justify-content:center;font-size:13px;font-weight:800}
+        .sb-aname{font-size:12px;font-weight:700;color:#e2e8f0}
+        .sb-arole{font-size:10px;color:#475569}
+        .sb-nav{flex:1;padding:6px 10px}
+        .sb-sec{font-size:10px;font-weight:700;color:#475569;
+            text-transform:uppercase;letter-spacing:1.2px;padding:12px 8px 6px}
+        .sb-link{display:flex;align-items:center;gap:10px;
+            padding:10px 12px;border-radius:10px;text-decoration:none;
+            font-size:13px;font-weight:600;color:#94a3b8;
+            transition:.2s;margin-bottom:2px;position:relative}
+        .sb-link:hover{background:rgba(255,255,255,.06);color:#e2e8f0}
+        .sb-link.active{background:rgba(37,99,235,.2);color:#60a5fa;
+            border:1px solid rgba(37,99,235,.25)}
+        .sb-link i{width:16px;text-align:center;font-size:13px}
+        .sb-footer{padding:14px;border-top:1px solid rgba(255,255,255,.06)}
+        .sb-logout{display:flex;align-items:center;gap:8px;padding:9px 12px;
+            border-radius:9px;text-decoration:none;font-size:13px;
+            font-weight:600;color:#94a3b8;transition:.2s;
+            width:100%;border:none;background:transparent;cursor:pointer}
+        .sb-logout:hover{background:rgba(239,68,68,.12);color:#fca5a5}
+
+        /* ── MAIN ── */
+        .main{margin-left:var(--sidebar);flex:1;display:flex;flex-direction:column}
+        .topbar{background:var(--w);height:60px;padding:0 26px;
+            display:flex;align-items:center;justify-content:space-between;
+            box-shadow:0 1px 0 #e2e8f0;position:sticky;top:0;z-index:50}
+        .topbar-left h1{font-size:17px;font-weight:800;color:var(--d)}
+        .topbar-left p{font-size:11px;color:var(--m);margin-top:1px}
+        .back-btn{display:flex;align-items:center;gap:7px;padding:8px 16px;
+            background:var(--l);color:var(--d);border-radius:9px;
+            text-decoration:none;font-size:13px;font-weight:600;transition:.2s}
+        .back-btn:hover{background:#e2e8f0}
+        .content{padding:24px 26px;flex:1}
+
+        /* HERO BANNER */
+        .trip-hero{
+            background:linear-gradient(135deg,#0f172a,#1e3a5f,#1e40af);
+            border-radius:20px;padding:24px 28px;margin-bottom:22px;
+            display:flex;align-items:center;gap:20px;flex-wrap:wrap;
+            box-shadow:0 8px 32px rgba(30,64,175,.35);
+            border:1px solid rgba(56,189,248,.2);
+            position:relative;overflow:hidden;
+        }
+        .trip-hero:before{content:'';position:absolute;
+            top:-60px;right:-60px;width:220px;height:220px;border-radius:50%;
+            background:radial-gradient(circle,rgba(56,189,248,.12) 0%,transparent 70%)}
+        .th-img{width:72px;height:72px;border-radius:14px;
+            object-fit:cover;border:2px solid rgba(255,255,255,.2);flex-shrink:0}
+        .th-ph{width:72px;height:72px;border-radius:14px;
+            background:linear-gradient(135deg,#1e3a5f,#2563eb);
+            display:flex;align-items:center;justify-content:center;
+            font-size:32px;border:2px solid rgba(255,255,255,.15);flex-shrink:0}
+        .th-info{flex:1;min-width:0;position:relative;z-index:1}
+        .th-route{font-size:22px;font-weight:900;color:#fff;margin-bottom:8px}
+        .th-route span{color:#38bdf8;margin:0 8px}
+        .th-pills{display:flex;gap:8px;flex-wrap:wrap}
+        .th-pill{font-size:12px;color:rgba(255,255,255,.85);
+            background:rgba(255,255,255,.1);padding:4px 12px;
+            border-radius:20px;border:1px solid rgba(255,255,255,.12);
+            display:flex;align-items:center;gap:5px}
+        .th-pill i{color:#38bdf8}
+        .cat-big{padding:7px 16px;border-radius:20px;font-size:12px;
+            font-weight:800;flex-shrink:0}
+        .cat-big.DELUXE{background:rgba(253,230,138,.2);color:#fde68a;
+            border:1px solid rgba(253,230,138,.3)}
+        .cat-big.NORMAL{background:rgba(110,231,183,.2);color:#6ee7b7;
+            border:1px solid rgba(110,231,183,.3)}
+
+        /* STAT BOXES */
+        .stat-row{display:grid;grid-template-columns:repeat(4,1fr);
+            gap:14px;margin-bottom:22px}
+        .stat-box{background:var(--w);border-radius:14px;padding:18px 20px;
+            box-shadow:var(--sh);border:1px solid #e8edf5;
+            text-align:center;border-top:3px solid}
+        .stat-box:nth-child(1){border-top-color:#2563eb}
+        .stat-box:nth-child(2){border-top-color:#10b981}
+        .stat-box:nth-child(3){border-top-color:#f59e0b}
+        .stat-box:nth-child(4){border-top-color:#8b5cf6}
+        .stat-box .sn{font-size:26px;font-weight:900;color:var(--d);line-height:1}
+        .stat-box .sl{font-size:11px;color:var(--m);margin-top:4px}
+
+        /* TWO COL */
+        .two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+
+        /* CARD */
+        .card{background:var(--w);border-radius:16px;
+            box-shadow:var(--sh);border:1px solid #e8edf5;overflow:hidden}
+        .card-head{padding:14px 20px;border-bottom:1px solid #f1f5f9;
+            display:flex;justify-content:space-between;align-items:center}
+        .card-head h2{font-size:14px;font-weight:800;color:var(--d);
+            display:flex;align-items:center;gap:8px}
+        .card-head h2 i{color:var(--p);font-size:13px}
+
+        /* ══════════════════════════════════════════
+           SEAT MAP — identical layout to user side
+        ══════════════════════════════════════════ */
+        .seat-map-wrap{padding:20px}
+
+        /* Legend */
+        .legend{display:flex;gap:16px;flex-wrap:wrap;
+            margin-bottom:18px;padding:13px 16px;
+            background:#f8fafc;border-radius:12px;align-items:center}
+        .leg{display:flex;align-items:center;gap:7px;
+            font-size:12px;font-weight:600;color:var(--m)}
+        .leg-dot{width:22px;height:22px;border-radius:6px;flex-shrink:0;
+            border:2px solid transparent}
+        .leg-dot.av{background:linear-gradient(135deg,#f1f5f9,#e2e8f0);
+            border-color:#94a3b8}
+        .leg-dot.co{background:linear-gradient(135deg,#f87171,#ef4444)}
+        .leg-dot.pe{background:linear-gradient(135deg,#fef3c7,#fde68a);
+            border-color:#fcd34d}
+        .leg-dot.dr{background:linear-gradient(135deg,#34d399,#10b981)}
+        .leg-dot.ex{background:linear-gradient(135deg,#c084fc,#a855f7)}
+
+        /* Hiace shell — same as select-seat.html */
+        .hiace-shell{
+            background:linear-gradient(135deg,#334155,#1e293b);
+            border-radius:25px;padding:20px;
+            box-shadow:0 20px 40px rgba(0,0,0,.3);
+            position:relative;overflow-x:auto;
+        }
+        .hiace-inner{
+            background:#f8fafc;border-radius:15px;
+            padding:20px;
+            box-shadow:inset 0 0 20px rgba(0,0,0,.05);
+        }
+
+        /* Seat table — same spacing as select-seat.html */
+        .seat-table{width:100%;border-collapse:separate;border-spacing:12px}
+
+        /* Base seat */
+        .seat{
+            width:75px;height:75px;border-radius:12px;
+            display:flex;flex-direction:column;
+            align-items:center;justify-content:center;
+            font-weight:800;font-size:18px;
+            border:3px solid transparent;
+            user-select:none;cursor:default;
+            box-shadow:0 4px 10px rgba(0,0,0,.1);
+            margin:0 auto;position:relative;
+        }
+        .seat .s-num{font-size:20px;font-weight:900;line-height:1}
+        .seat .s-lbl{font-size:11px;font-weight:700;opacity:.8;margin-top:5px}
+
+        /* Available */
+        .seat.av{
+            background:linear-gradient(135deg,#f1f5f9,#e2e8f0);
+            border-color:#94a3b8;color:#475569;
+        }
+        /* Confirmed — red like select-seat booked */
+        .seat.co{
+            background:linear-gradient(135deg,#fee2e2,#fecaca);
+            border-color:#f87171;color:#dc2626;
+            overflow:hidden;
+        }
+        .seat.co:after{
+            content:'✗';position:absolute;
+            font-size:40px;opacity:.2;font-weight:bold;
+        }
+        /* Pending — yellow */
+        .seat.pe{
+            background:linear-gradient(135deg,#fef9c3,#fde68a);
+            border-color:#fcd34d;color:#92400e;
+        }
+        /* Driver — green */
+        .seat.dr{
+            background:linear-gradient(135deg,#34d399,#10b981);
+            border-color:#059669;color:#fff;
+            width:100%;min-height:162px;cursor:default;
+        }
+        .seat.dr .s-num{font-size:32px}
+        /* Extra seat A & B — purple */
+        .seat.ex{
+            background:linear-gradient(135deg,#c084fc,#a855f7);
+            border-color:#7c3aed;color:#fff;
+        }
+        .seat.ex.co{
+            background:linear-gradient(135deg,#fee2e2,#fecaca);
+            border-color:#f87171;color:#dc2626;
+        }
+        .seat.ex.pe{
+            background:linear-gradient(135deg,#fef9c3,#fde68a);
+            border-color:#fcd34d;color:#92400e;
+        }
+
+        /* Windshield */
+        .windshield-col{
+            background:linear-gradient(135deg,#0ea5e9,#38bdf8);
+            border-radius:15px;
+            display:flex;flex-direction:column;
+            align-items:center;justify-content:center;
+            gap:15px;padding:20px 10px;height:100%;
+            box-shadow:inset 0 2px 10px rgba(255,255,255,.3),
+                        0 5px 15px rgba(0,0,0,.2);
+            position:relative;overflow:hidden;
+        }
+        .windshield-col:before{
+            content:'';position:absolute;top:-100%;left:0;
+            width:100%;height:100%;
+            background:linear-gradient(180deg,transparent,
+                rgba(255,255,255,.3),transparent);
+            animation:shineV 3s infinite;
+        }
+        @keyframes shineV{0%{top:-100%}20%,100%{top:100%}}
+        .windshield-col i{font-size:32px;color:#0c4a6e}
+        .windshield-col span{font-size:14px;font-weight:800;color:#0c4a6e;
+            writing-mode:vertical-rl;letter-spacing:4px}
+
+        /* Way / Door */
+        .cell-way{text-align:center;font-size:18px;font-weight:800;
+            color:#64748b;letter-spacing:10px;padding:25px 0;
+            background:linear-gradient(135deg,#f1f5f9,#e2e8f0);
+            border-radius:12px;}
+        .cell-way i{color:#f59e0b;margin:0 5px}
+        .cell-door{
+            background:linear-gradient(135deg,#fef3c7,#fde68a);
+            border:2px solid #f59e0b;border-radius:12px;
+            height:75px;display:flex;flex-direction:column;
+            align-items:center;justify-content:center;
+            font-size:13px;font-weight:800;color:#92400e;gap:5px;
+        }
+        .cell-door i{font-size:24px}
+        .hiace-bumper{
+            background:linear-gradient(135deg,#475569,#1e293b);
+            height:20px;border-radius:0 0 15px 15px;margin-top:20px;
+        }
+
+        /* PASSENGERS TABLE */
+        .bk-table{width:100%;border-collapse:collapse}
+        .bk-table th{font-size:10.5px;font-weight:800;color:var(--m);
+            text-transform:uppercase;letter-spacing:.8px;
+            padding:10px 16px;background:#f8fafc;
+            border-bottom:2px solid #e8edf5;text-align:left}
+        .bk-table td{padding:12px 16px;border-bottom:1px solid #f1f5f9;
+            font-size:13px;vertical-align:middle}
+        .bk-table tr:last-child td{border-bottom:none}
+        .bk-table tr:hover td{background:#fafbff}
+        .sp{display:inline-flex;align-items:center;gap:4px;
+            padding:4px 11px;border-radius:20px;font-size:11px;font-weight:800}
+        .sp.CONFIRMED{background:#d1fae5;color:#065f46}
+        .sp.PENDING{background:#fef3c7;color:#92400e}
+        .sp.CANCELLED{background:#fee2e2;color:#991b1b}
+        .pp{display:inline-flex;align-items:center;gap:4px;
+            padding:4px 11px;border-radius:20px;font-size:11px;font-weight:800}
+        .pp.SUCCESS{background:#d1fae5;color:#065f46}
+        .pp.PENDING{background:#fef3c7;color:#92400e}
+        .pp.FAILED{background:#fee2e2;color:#991b1b}
+        .seat-num{background:var(--pl);color:var(--p);
+            padding:3px 10px;border-radius:8px;font-weight:800;font-size:12px}
+        .empty-cell{text-align:center;padding:45px!important;color:var(--m)}
+        .empty-cell i{font-size:32px;display:block;margin-bottom:10px;opacity:.3}
+
+        @media(max-width:1200px){.two-col{grid-template-columns:1fr}
+            .stat-row{grid-template-columns:1fr 1fr}}
+        @media(max-width:640px){.stat-row{grid-template-columns:1fr}
+            .sidebar{transform:translateX(-100%)}.main{margin-left:0}
+            .seat{width:55px;height:55px}
+            .seat .s-num{font-size:14px}
+            .seat-table{border-spacing:7px}}
+    </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+    <div class="sb-brand">
+        <a href="/admin/dashboard" class="sb-logo">
+            <div class="sb-icon">🚐</div>
+            <div><div class="sb-title">Hiace<span>Booking</span></div></div>
+        </a>
+    </div>
+    <div class="sb-admin">
+        <div class="sb-av">A</div>
+        <div><div class="sb-aname">Administrator</div>
+             <div class="sb-arole">Super Admin</div></div>
+    </div>
+    <nav class="sb-nav">
+        <div class="sb-sec">Main Menu</div>
+        <a th:href="@{/admin/dashboard}" class="sb-link">
+            <i class="fas fa-chart-line"></i> Dashboard</a>
+        <a th:href="@{/admin/hiaces}" class="sb-link">
+            <i class="fas fa-shuttle-van"></i> Manage Hiaces</a>
+        <a th:href="@{/admin/routes}" class="sb-link">
+            <i class="fas fa-route"></i> Manage Routes</a>
+        <div class="sb-sec">Bookings</div>
+        <a th:href="@{/admin/bookings}" class="sb-link">
+            <i class="fas fa-ticket-alt"></i> All Bookings</a>
+        <a th:href="@{/admin/upcoming-trips}" class="sb-link active">
+            <i class="fas fa-calendar-alt"></i> Upcoming Trips</a>
+        <div class="sb-sec">Users</div>
+        <a th:href="@{/admin/users}" class="sb-link">
+            <i class="fas fa-users"></i> View Users</a>
+    </nav>
+    <div class="sb-footer">
+        <a th:href="@{/users/logout}" class="sb-logout">
+            <i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+    <header class="topbar">
+        <div class="topbar-left">
+            <h1>Trip Detail</h1>
+            <p th:text="${route.source}+' → '+${route.destination}+
+               ' — '+${#temporals.format(route.departureDate,'dd MMM yyyy')}">
+            </p>
+        </div>
+        <a th:href="@{/admin/upcoming-trips}" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Back to Trips
+        </a>
+    </header>
+
+    <div class="content">
+
+        <!-- HERO -->
+        <div class="trip-hero">
+            <img th:if="${route.hiace.imageName != null}"
+                 th:src="@{'/uploads/'+${route.hiace.imageName}}"
+                 class="th-img" th:alt="${route.hiace.vehicleNumber}">
+            <div th:unless="${route.hiace.imageName != null}" class="th-ph">🚐</div>
+            <div class="th-info">
+                <div class="th-route">
+                    <span th:text="${route.source}"></span>
+                    <span>→</span>
+                    <span th:text="${route.destination}"></span>
+                </div>
+                <div class="th-pills">
+                    <span class="th-pill">
+                        <i class="fas fa-shuttle-van"></i>
+                        <span th:text="${route.hiace.vehicleNumber}"></span>
+                    </span>
+                    <span class="th-pill">
+                        <i class="fas fa-user-tie"></i>
+                        <span th:text="${route.hiace.driverName}"></span>
+                    </span>
+                    <span class="th-pill">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span th:text="${#temporals.format(
+                              route.departureDate,'dd MMM yyyy')}"></span>
+                    </span>
+                    <span class="th-pill">
+                        <i class="fas fa-clock"></i>
+                        <span th:text="${route.departureTime}"></span>
+                    </span>
+                    <span class="th-pill">
+                        <i class="fas fa-tag"></i>
+                        Rs. <span th:text="${route.fare}"></span> / seat
+                    </span>
+                </div>
+            </div>
+            <span class="cat-big"
+                  th:classappend="${route.hiace.category}"
+                  th:text="${route.hiace.category}"></span>
+        </div>
+
+        <!-- STAT BOXES -->
+        <div class="stat-row">
+            <div class="stat-box">
+                <div class="sn" th:text="${route.hiace.totalSeats}"></div>
+                <div class="sl">Total Seats</div>
+            </div>
+            <div class="stat-box">
+                <div class="sn" th:text="${bookings.size()}"></div>
+                <div class="sl">Seats Booked</div>
+            </div>
+            <div class="stat-box">
+                <div class="sn" th:text="${availableSeats}"></div>
+                <div class="sl">Seats Available</div>
+            </div>
+            <div class="stat-box">
+                <div class="sn"
+                     th:text="'Rs.'+${confirmedCount * route.fare}"></div>
+                <div class="sl">Confirmed Income</div>
+            </div>
+        </div>
+
+        <!-- SEAT MAP + PASSENGERS -->
+        <div class="two-col">
+
+            <!-- ══ SEAT MAP ══════════════════════════════════════ -->
+            <div class="card">
+                <div class="card-head">
+                    <h2><i class="fas fa-chair"></i> Seat Map</h2>
+                    <div style="display:flex;gap:10px;font-size:12px;font-weight:700">
+                        <span style="color:#059669"
+                              th:text="${availableSeats}+' free'"></span>
+                        <span style="color:#dc2626"
+                              th:text="${bookings.size()}+' taken'"></span>
+                    </div>
+                </div>
+                <div class="seat-map-wrap">
+
+                    <!-- Legend -->
+                    <div class="legend">
+                        <div class="leg">
+                            <div class="leg-dot av"></div> Available
+                        </div>
+                        <div class="leg">
+                            <div class="leg-dot co"></div> Confirmed
+                        </div>
+                        <div class="leg">
+                            <div class="leg-dot pe"></div> Pending
+                        </div>
+                        <div class="leg">
+                            <div class="leg-dot dr"></div> Driver
+                        </div>
+                        <div class="leg">
+                            <div class="leg-dot ex"></div> Side Seat
+                        </div>
+                    </div>
+
+                    <!--
+                      SEAT LAYOUT — exact same as select-seat.html:
+                      Row 1: Windshield(x4) | Driver(x2) | 3 | 6 | 9 | 13
+                      Row 2: Windshield     | Driver     | 2 | 5 | 8 | 12
+                      Row 3: Windshield     | B(14)      | 1 | WAY(x2) | 11
+                      Row 4: Windshield     | A(15)      | DOOR | 4 | 7 | 10
+
+                      seatStatusMap: Integer seat# → "CONFIRMED"|"PENDING"|null
+                    -->
+                    <div class="hiace-shell">
+                        <div class="hiace-inner">
+                            <table class="seat-table">
+                                <tbody>
+
+                                <!-- ROW 1: 3 6 9 13 -->
+                                <tr>
+                                    <!-- Windshield spans all 4 rows -->
+                                    <td rowspan="4"
+                                        style="vertical-align:middle;width:100px">
+                                        <div class="windshield-col">
+                                            <i class="fas fa-tachometer-alt"></i>
+                                            <span>WINDSHIELD</span>
+                                            <i class="fas fa-tachometer-alt"></i>
+                                        </div>
+                                    </td>
+                                    <!-- Driver spans rows 1+2 -->
+                                    <td rowspan="2"
+                                        style="vertical-align:middle">
+                                        <div class="seat dr">
+                                            <span class="s-num">
+                                                <i class="fas fa-user-circle"></i>
+                                            </span>
+                                            <span class="s-lbl">DRIVER</span>
+                                        </div>
+                                    </td>
+                                    <!-- Seat 3 -->
+                                    <td>
+                                        <div th:class="${seatStatusMap[3] == 'CONFIRMED'}
+                                             ? 'seat co' :
+                                             (${seatStatusMap[3] == 'PENDING'}
+                                             ? 'seat pe' : 'seat av')">
+                                            <span class="s-num">3</span>
+                                            <span class="s-lbl"
+                                                  th:text="${seatStatusMap[3] == 'CONFIRMED'}
+                                                  ? '✗' :
+                                                  (${seatStatusMap[3] == 'PENDING'}
+                                                  ? '⏳' : '○')">
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <!-- Seat 6 -->
+                                    <td>
+                                        <div th:class="${seatStatusMap[6] == 'CONFIRMED'}
+                                             ? 'seat co' :
+                                             (${seatStatusMap[6] == 'PENDING'}
+                                             ? 'seat pe' : 'seat av')">
+                                            <span class="s-num">6</span>
+                                            <span class="s-lbl"
+                                                  th:text="${seatStatusMap[6] == 'CONFIRMED'}
+                                                  ? '✗' :
+                                                  (${seatStatusMap[6] == 'PENDING'}
+                                                  ? '⏳' : '○')">
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <!-- Seat 9 -->
+                                    <td>
+                                        <div th:class="${seatStatusMap[9] == 'CONFIRMED'}
+                                             ? 'seat co' :
+                                             (${seatStatusMap[9] == 'PENDING'}
+                                             ? 'seat pe' : 'seat av')">
+                                            <span class="s-num">9</span>
+                                            <span class="s-lbl"
+                                                  th:text="${seatStatusMap[9] == 'CONFIRMED'}
+                                                  ? '✗' :
+                                                  (${seatStatusMap[9] == 'PENDING'}
+                                                  ? '⏳' : '○')">
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <!-- Seat 13 -->
+                                    <td>
+                                        <div th:class="${seatStatusMap[13] == 'CONFIRMED'}
+                                             ? 'seat co' :
+                                             (${seatStatusMap[13] == 'PENDING'}
+                                             ? 'seat pe' : 'seat av')">
+                                            <span class="s-num">13</span>
+                                            <span class="s-lbl"
+                                                  th:text="${seatStatusMap[13] == 'CONFIRMED'}
+                                                  ? '✗' :
+                                                  (${seatStatusMap[13] == 'PENDING'}
+                                                  ? '⏳' : '○')">
+                                            </span>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <!-- ROW 2: 2 5 8 12 -->
+                                <tr>
+                                    <td>
+                                        <div th:class="${seatStatusMap[2] == 'CONFIRMED'}
+                                             ? 'seat co' :
+                                             (${seatStatusMap[2] == 'PENDING'}
+                                             ? 'seat pe' : 'seat av')">
+                                            <span class="s-num">2</span>
+                                            <span class="s-lbl"
+                                                  th:text="${seatStatusMap[2] == 'CONFIRMED'}
+                                                  ? '✗' :
+                                                  (${seatStatusMap[2] == 'PENDING'}
+                                                  ? '⏳' : '○')">
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div th:class="${seatStatusMap[5] == 'CONFIRMED'}
+                                             ? 'seat co' :
+                                             (${seatStatusMap[5] == 'PENDING'}
+                                             ? 'seat pe' : 'seat av')">
+                                            <span class="s-num">5</span>
+                                            <span class="s-lbl"
+                                                  th:text="${seatStatusMap[5] == 'CONFIRMED'}
+                                                  ? '✗' :
+                                                  (${seatStatusMap[5] == 'PENDING'}
+                                                  ? '⏳' : '○')">
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div th:class="${seatStatusMap[8] == 'CONFIRMED'}
+                                             ? 'seat co' :
+                                             (${seatStatusMap[8] == 'PENDING'}
+                                             ? 'seat pe' : 'seat av')">
+                                            <span class="s-num">8</span>
+                                            <span class="s-lbl"
+                                                  th:text="${seatStatusMap[8] == 'CONFIRMED'}
+                                                  ? '✗' :
+                                                  (${seatStatusMap[8] == 'PENDING'}
+                                                  ? '⏳' : '○')">
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div th:class="${seatStatusMap[12] == 'CONFIRMED'}
+                                             ? 'seat co' :
+                                             (${seatStatusMap[12] == 'PENDING'}
+                                             ? 'seat pe' : 'seat av')">
+                                            <span class="s-num">12</span>
+                                            <span class="s-lbl"
+                                                  th:text="${seatStatusMap[12] == 'CONFIRMED'}
+                                                  ? '✗' :
+                                                  (${seatStatusMap[12] == 'PENDING'}
+                                                  ? '⏳' : '○')">
+                                            </span>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <!-- ROW 3: B(14) | 1 | WAY | WAY | 11 -->
+                                <tr>
+                                    <!-- B = seat 14 -->
+                                    <td>
+                                        <div th:class="${seatStatusMap[14] == 'CONFIRMED'}
+                                             ? 'seat ex co' :
+                                             (${seatStatusMap[14] == 'PENDING'}
+                                             ? 'seat ex pe' : 'seat ex')">
+                                            <span class="s-num">B</span>
+                                            <span class="s-lbl"
+                                                  th:text="${seatStatusMap[14] == 'CONFIRMED'}
+                                                  ? '✗' :
+                                                  (${seatStatusMap[14] == 'PENDING'}
+                                                  ? '⏳' : '○')">
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <!-- Seat 1 -->
+                                    <td>
+                                        <div th:class="${seatStatusMap[1] == 'CONFIRMED'}
+                                             ? 'seat co' :
+                                             (${seatStatusMap[1] == 'PENDING'}
+                                             ? 'seat pe' : 'seat av')">
+                                            <span class="s-num">1</span>
+                                            <span class="s-lbl"
+                                                  th:text="${seatStatusMap[1] == 'CONFIRMED'}
+                                                  ? '✗' :
+                                                  (${seatStatusMap[1] == 'PENDING'}
+                                                  ? '⏳' : '○')">
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <!-- WAY spans 2 cols -->
+                                    <td colspan="2">
+                                        <div class="cell-way">
+                                            <i class="fas fa-road"></i>
+                                            W A Y
+                                            <i class="fas fa-road"></i>
+                                        </div>
+                                    </td>
+                                    <!-- Seat 11 -->
+                                    <td>
+                                        <div th:class="${seatStatusMap[11] == 'CONFIRMED'}
+                                             ? 'seat co' :
+                                             (${seatStatusMap[11] == 'PENDING'}
+                                             ? 'seat pe' : 'seat av')">
+                                            <span class="s-num">11</span>
+                                            <span class="s-lbl"
+                                                  th:text="${seatStatusMap[11] == 'CONFIRMED'}
+                                                  ? '✗' :
+                                                  (${seatStatusMap[11] == 'PENDING'}
+                                                  ? '⏳' : '○')">
+                                            </span>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <!-- ROW 4: A(15) | DOOR | 4 | 7 | 10 -->
+                                <tr>
+                                    <!-- A = seat 15 -->
+                                    <td>
+                                        <div th:class="${seatStatusMap[15] == 'CONFIRMED'}
+                                             ? 'seat ex co' :
+                                             (${seatStatusMap[15] == 'PENDING'}
+                                             ? 'seat ex pe' : 'seat ex')">
+                                            <span class="s-num">A</span>
+                                            <span class="s-lbl"
+                                                  th:text="${seatStatusMap[15] == 'CONFIRMED'}
+                                                  ? '✗' :
+                                                  (${seatStatusMap[15] == 'PENDING'}
+                                                  ? '⏳' : '○')">
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <!-- Door -->
+                                    <td>
+                                        <div class="cell-door">
+                                            <i class="fas fa-door-open"></i>
+                                            DOOR
+                                        </div>
+                                    </td>
+                                    <!-- Seat 4 -->
+                                    <td>
+                                        <div th:class="${seatStatusMap[4] == 'CONFIRMED'}
+                                             ? 'seat co' :
+                                             (${seatStatusMap[4] == 'PENDING'}
+                                             ? 'seat pe' : 'seat av')">
+                                            <span class="s-num">4</span>
+                                            <span class="s-lbl"
+                                                  th:text="${seatStatusMap[4] == 'CONFIRMED'}
+                                                  ? '✗' :
+                                                  (${seatStatusMap[4] == 'PENDING'}
+                                                  ? '⏳' : '○')">
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <!-- Seat 7 -->
+                                    <td>
+                                        <div th:class="${seatStatusMap[7] == 'CONFIRMED'}
+                                             ? 'seat co' :
+                                             (${seatStatusMap[7] == 'PENDING'}
+                                             ? 'seat pe' : 'seat av')">
+                                            <span class="s-num">7</span>
+                                            <span class="s-lbl"
+                                                  th:text="${seatStatusMap[7] == 'CONFIRMED'}
+                                                  ? '✗' :
+                                                  (${seatStatusMap[7] == 'PENDING'}
+                                                  ? '⏳' : '○')">
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <!-- Seat 10 -->
+                                    <td>
+                                        <div th:class="${seatStatusMap[10] == 'CONFIRMED'}
+                                             ? 'seat co' :
+                                             (${seatStatusMap[10] == 'PENDING'}
+                                             ? 'seat pe' : 'seat av')">
+                                            <span class="s-num">10</span>
+                                            <span class="s-lbl"
+                                                  th:text="${seatStatusMap[10] == 'CONFIRMED'}
+                                                  ? '✗' :
+                                                  (${seatStatusMap[10] == 'PENDING'}
+                                                  ? '⏳' : '○')">
+                                            </span>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                </tbody>
+                            </table>
+                        </div><!-- hiace-inner -->
+                        <div class="hiace-bumper"></div>
+                    </div><!-- hiace-shell -->
+
+                </div><!-- seat-map-wrap -->
+            </div><!-- card -->
+
+            <!-- ══ PASSENGERS TABLE ═════════════════════════════ -->
+            <div class="card">
+                <div class="card-head">
+                    <h2><i class="fas fa-users"></i> Passengers</h2>
+                    <span style="background:var(--pl);color:var(--p);
+                          padding:4px 12px;border-radius:20px;
+                          font-size:12px;font-weight:700;"
+                          th:text="${bookings.size()}+' booked'">
+                    </span>
+                </div>
+                <table class="bk-table">
+                    <thead>
+                        <tr>
+                            <th>Seat</th>
+                            <th>Passenger</th>
+                            <th>Phone</th>
+                            <th>Status</th>
+                            <th>Payment</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${#lists.isEmpty(bookings)}">
+                            <td colspan="5" class="empty-cell">
+                                <i class="fas fa-users"></i>
+                                <p>No bookings for this trip yet.</p>
+                            </td>
+                        </tr>
+                        <tr th:each="b : ${bookings}">
+                            <td>
+                                <span class="seat-num"
+                                      th:text="${b.seatNumber}">
+                                </span>
+                            </td>
+                            <td>
+                                <div style="font-weight:700;color:var(--d);"
+                                     th:text="${b.user.firstname}+' '+
+                                     ${b.user.lastname}">
+                                </div>
+                                <div style="font-size:11px;color:var(--m);"
+                                     th:text="${b.user.email}">
+                                </div>
+                            </td>
+                            <td style="color:var(--m);font-size:12px;"
+                                th:text="${b.user.phone}">
+                            </td>
+                            <td>
+                                <span class="sp"
+                                      th:classappend="${b.bookingStatus}"
+                                      th:text="${b.bookingStatus}">
+                                </span>
+                            </td>
+                            <td>
+                                <span class="pp"
+                                      th:classappend="${b.paymentStatus}"
+                                      th:text="${b.paymentStatus}">
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div><!-- two-col -->
+    </div><!-- content -->
+</div><!-- main -->
+
+</body>
+</html>
