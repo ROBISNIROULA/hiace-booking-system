@@ -1,2 +1,7 @@
-/mvnw text eol=lf
-*.cmd text eol=crlf
+# Tell GitHub to treat HTML files as documentation not code
+*.html linguist-documentation=true
+*.css  linguist-documentation=true
+*.js   linguist-documentation=true
+
+# Tell GitHub Java is the main language
+*.java linguist-detectable=true 
