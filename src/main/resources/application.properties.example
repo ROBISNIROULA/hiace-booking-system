@@ -1,0 +1,25 @@
+# Database Configuration
+spring.datasource.url=jdbc:mysql://localhost:3306/hiacedb
+spring.datasource.username=root
+spring.datasource.password=YOUR_DB_PASSWORD_HERE
+
+# JPA Configuration
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+
+# Gmail SMTP Configuration
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=YOUR_GMAIL_HERE@gmail.com
+spring.mail.password=YOUR_APP_PASSWORD_HERE
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+
+# eSewa Configuration
+esewa.merchant.code=YOUR_MERCHANT_CODE_HERE
+esewa.secret.key=YOUR_SECRET_KEY_HERE
+esewa.payment.url=https://rc-epay.esewa.com.np/api/epay/main/v2/form
+esewa.verify.url=https://rc.esewa.com.np/api/epay/transaction/status/
+
+# Server
+server.port=8080
